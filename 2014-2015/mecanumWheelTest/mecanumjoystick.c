@@ -23,6 +23,8 @@ task main()
 			motor[rightFront] = -abs(joystick.joy1_x2);
 			motor[leftBack] = -abs(joystick.joy1_x2);
 			motor[rightBack] = abs(joystick.joy1_x2);
+    }else if(joystick.joy1_TopHat != -1){
+    	motor[leftFront] = 75;
     }else{
     	motor[leftFront] = joystick.joy1_y1;
 			motor[rightFront] = joystick.joy1_y2;
