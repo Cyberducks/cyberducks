@@ -43,7 +43,7 @@ task main()
 	motor[leftBack] = 0;
 	motor[rightBack] = 0;
 
-	wait10Msec(100)
+	wait10Msec(100);
 
 	motor[leftFront] = 75;
 	motor[rightFront] = -75;
