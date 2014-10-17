@@ -24,13 +24,56 @@ task main()
 			motor[leftBack] = -abs(joystick.joy1_x2);
 			motor[rightBack] = abs(joystick.joy1_x2);
     }else if(joystick.joy1_TopHat != -1){
-    	motor[leftFront] = 75;
+    	if(joystick.joy1_TopHat == 0){
+    		motor[leftFront] = 20;
+				motor[rightFront] = 20;
+				motor[leftBack] = 20;
+				motor[rightBack] = 20;
+    	}else if(joystick.joy1_TopHat == 1){
+				motor[rightFront] = 20;
+				motor[leftBack] = 20;
+    	}else if(joystick.joy1_TopHat == 2){
+    		motor[leftFront] = -20;
+				motor[rightFront] = 20;
+				motor[leftBack] = 20;
+				motor[rightBack] = -20;
+    	}else if(joystick.joy1_TopHat == 3){
+    		motor[leftFront] = -20;
+				motor[rightBack] = -20;
+    	}else if(joystick.joy1_TopHat == 4){
+    		motor[leftFront] = -20;
+				motor[rightFront] = -20;
+				motor[leftBack] = -20;
+				motor[rightBack] = -20;
+    	}else if(joystick.joy1_TopHat == 5){
+    		motor[rightFront] = -20;
+				motor[leftBack] = -20;
+    	}else if(joystick.joy1_TopHat == 6){
+    		motor[leftFront] = 20;
+				motor[rightFront] = -20;
+				motor[leftBack] = -20;
+				motor[rightBack] = 20;
+    	}else if(joystick.joy1_TopHat == 7){
+    		motor[leftFront] = 20;
+				motor[rightBack] = 20;
+    	}
     }else{
     	motor[leftFront] = joystick.joy1_y1;
 			motor[rightFront] = joystick.joy1_y2;
 			motor[leftBack] = joystick.joy1_y1;
 			motor[rightBack] = joystick.joy1_y2;
     }
+    //simple breaking test bc of wheel drifting with mecanum rollers
+    //on secound thought this may occur very rapidly and constantly bc i am using if() statements instead of while() loops xd
+    	motor[leftFront] = 20;
+			motor[rightFront] = 20;
+			motor[leftBack] = -20;
+			motor[rightBack] = -20;
+			wait10Msec(20);
+			motor[leftFront] = 0;
+			motor[rightFront] = 0;
+			motor[leftBack] = 0;
+			motor[rightBack] = 0;
   }
 
 
