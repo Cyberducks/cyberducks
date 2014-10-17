@@ -64,7 +64,7 @@ task main()
 			motor[rightBack] = joystick.joy1_y2;
     }
     //simple breaking test bc of wheel drifting with mecanum rollers
-    //on secound thought this may occur very rapidly and constantly bc i am using if() statements instead of while() loops xd
+    //on secound thought this may occur very rapidly and constantly bc i am using if() statements instead of while() loops xd yh
     	motor[leftFront] = 20;
 			motor[rightFront] = 20;
 			motor[leftBack] = -20;
