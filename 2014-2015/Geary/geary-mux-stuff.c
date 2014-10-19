@@ -1,5 +1,5 @@
 
-#include "../drivers/hitechnic-sensormux.h"  // needs to come before gyro.h
+//#include "../drivers/hitechnic-sensormux.h"  // needs to come before gyro.h
 #include "../drivers/hitechnic-gyro.h"
 #include "../drivers/lego-light.h"
 #include "../drivers/lego-ultrasound.h"
@@ -27,14 +27,14 @@ const int TurnTimeLimit = 3500; // millisecs
 int DriveByButtonSpeed = 50;
 
 // see xander's gyro mux example: http://botbench.com/driversuite/hitechnic-gyro-_s_m_u_x-test1_8c-example.html
-const tMUXSensor HTGYRO = msensor_S2_4;
+//const tMUXSensor HTGYRO = msensor_S2_4;
 
 // see xander's mux sample code... http://botbench.com/driversuite/lego-ultrasound-_s_m_u_x-test1_8c-example.html
-const tMUXSensor LEGOUS2 = msensor_S2_2;
-const tMUXSensor LEGOUS3 = msensor_S2_3;
+//const tMUXSensor LEGOUS2 = msensor_S2_2;
+//const tMUXSensor LEGOUS3 = msensor_S2_3;
 
 // see xander's light mux sample: http://botbench.com/driversuite/lego-light-_s_m_u_x-test1_8c-example.html
-const tMUXSensor LEGOLS = msensor_S2_1;
+//const tMUXSensor LEGOLS = msensor_S2_1;
 
 // Task to keep track of the current heading using the HT Gyro, by Xander
 task getHeading () {
@@ -139,7 +139,7 @@ void ExtendLightServo (void) {
     servo[servo2] = 110;
     }
 }
-
+/*
 void TrackBySonar (void) {
 	  int range2 = USreadDist(LEGOUS2); // SensorValue[sonar3];
 	  int range3 = USreadDist(LEGOUS3); // SensorValue[sonar4];
@@ -153,7 +153,7 @@ void TrackBySonar (void) {
     }
     wait1Msec(ServoFreq);
 }
-
+*/
 
 void TurnLeft (int forwardOrBackward) {
           nxtDisplayTextLine(3, "turning left");
@@ -246,7 +246,7 @@ void Turn180 (void) {
   StopMotors();
 	StopTask (limitMotorTime);
 }
-
+/*
 task AvoidWalls() {
     while((USreadDist(LEGOUS2) > 10) && (USreadDist(LEGOUS3) > 10)) { wait1Msec(300); }
     StopMotors();
@@ -254,7 +254,7 @@ task AvoidWalls() {
     wait1Msec(500);
     StopAllTasks();
 }
-
+*/
 // prepare i/o on protoboard for two lights
 void InitProtoboardLights () {
   // Set B0 and B1 as output
