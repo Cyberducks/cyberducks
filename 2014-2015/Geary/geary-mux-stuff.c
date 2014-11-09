@@ -1,8 +1,9 @@
 
 //#include "../drivers/hitechnic-sensormux.h"  // needs to come before gyro.h
-#include "../drivers/hitechnic-gyro.h"
-#include "../drivers/lego-light.h"
-#include "../drivers/lego-ultrasound.h"
+#include "../drivers-3x/hitechnic-superpro.h"
+#include "../drivers-3x/hitechnic-gyro.h"
+#include "../drivers-3x/lego-light.h"
+//#include "../drivers/lego-ultrasound.h"
 #include "../drivers/hitechnic-superpro.h"
 
 
@@ -156,15 +157,17 @@ void TrackBySonar (void) {
 */
 
 void TurnLeft (int forwardOrBackward) {
-          nxtDisplayTextLine(3, "turning left");
-          motor[left] = DriveByButtonSpeed * 2 / 5 * forwardOrBackward;
-          motor[right] = DriveByButtonSpeed * forwardOrBackward;
+          nxtDisplayTextLine(2, "turning left");
+          HTSPBwriteIO(HTSPB, 0x1); // green means starboard, i.e. turn left, was... nxtDisplayTextLine(1, "turn Left");
+          motor[left] = DriveByButtonSpeed * 1 / 5 * forwardOrBackward;
+          motor[right] = DriveByButtonSpeed * 3 * forwardOrBackward;
 }
 
 void TurnRight (int forwardOrBackward) {
-          nxtDisplayTextLine(3, "turning right");
-          motor[left] = DriveByButtonSpeed * forwardOrBackward;
-          motor[right] = DriveByButtonSpeed* 2 / 5 * forwardOrBackward;
+          nxtDisplayTextLine(2, "turning right");
+          HTSPBwriteIO(HTSPB, 0x2); // red means port, i.e. turn right, was... nxtDisplayTextLine(1, "turn Right");
+          motor[left] = DriveByButtonSpeed * 3 * forwardOrBackward;
+          motor[right] = DriveByButtonSpeed* 1 / 5 * forwardOrBackward;
 }
 
 void RotateLeft (int speed) {
@@ -192,8 +195,11 @@ void StopMotors (void) {
 
 void GoStraightByGyro (float straightHead) {
       	// stay on heading from before button was pressed
+        nxtDisplayTextLine(3, "head: %3.0f", currHeading);
+        nxtDisplayTextLine(4, "target: %3.0f", straightHead);
+        nxtDisplayTextLine(5, "diff: %3.0f", SubtractFromCurrHeading (straightHead));
         if (SubtractFromCurrHeading (straightHead) > GyroTolerance) {
-        	TurnLeft(Forward);
+          TurnLeft(Forward);
       } else if (SubtractFromCurrHeading (straightHead) < -GyroTolerance) {
           TurnRight(Forward);
       } else  {
@@ -274,4 +280,8 @@ void LightLed (int num) {
 
 void LightBothLeds () {
 	HTSPBwriteIO(HTSPB, 0x3);
+}
+
+void LightOff () {
+	HTSPBwriteIO(HTSPB, 0x0); // indicate not turning
 }
