@@ -1,6 +1,5 @@
 #pragma config(Hubs,  S2, HTMotor,  HTServo,  none,     none)
-#pragma config(Sensor, S2,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S3,     HTSPB,          sensorSONAR)
+#pragma config(Sensor, S3,     HTSPB,                sensorI2CCustom9V)
 #pragma config(Sensor, S4,     HTGYRO,         sensorAnalogInactive)
 #pragma config(Motor,  mtr_S2_C1_1,     left,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S2_C1_2,     right,         tmotorTetrix, PIDControl, encoder)
@@ -40,6 +39,9 @@ main ()
   //bool go_forward, go_back, go_left, go_right, trigger_pressed;
 
   //float straightHead;
+
+  InitProtoboardLights();
+  wait1Msec(1000);
 
   StartTask(getHeading);
   wait1Msec(300);
