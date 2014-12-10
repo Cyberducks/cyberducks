@@ -51,7 +51,7 @@ main ()
 
   float startHeading = currHeading;
   float flipHeading = startHeading + 180;
-  const int onewayDistance = 10000;
+  const int onewayDistance = 6000;
 
   //for (int count = 1; count <= 1; count++) { // turn back and forth several times
 
@@ -62,17 +62,16 @@ main ()
 
     nMotorEncoder[right] = 0;
     while (nMotorEncoder[right] < onewayDistance) {
-		  GoStraightByGyro(startHeading);
+		  GoStraightWithoutGyro();
 		}
 
 	  Turn180();
 
 	  nMotorEncoder[right] = 0;
 	  while (nMotorEncoder[right] < onewayDistance) {
-		  GoStraightByGyro(flipHeading);
+		  GoStraightWithoutGyro();
 		}
 
 
-	LightsOff();
   StopAllTasks ();
 }
