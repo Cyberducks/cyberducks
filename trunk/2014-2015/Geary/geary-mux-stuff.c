@@ -1,11 +1,8 @@
-
-//#include "../drivers/hitechnic-sensormux.h"  // needs to come before gyro.h
+#include "../drivers-3x/hitechnic-sensormux.h"  // needs to come before gyro.h
 #include "../drivers-3x/hitechnic-superpro.h"
 #include "../drivers-3x/hitechnic-gyro.h"
 #include "../drivers-3x/lego-light.h"
-//#include "../drivers/lego-ultrasound.h"
-#include "../drivers/hitechnic-superpro.h"
-
+#include "../drivers-3x/lego-ultrasound.h"
 
 // ********************************* globals ************************************
 
@@ -28,14 +25,12 @@ const int TurnTimeLimit = 3500; // millisecs
 int DriveByButtonSpeed = 10;
 
 // see xander's gyro mux example: http://botbench.com/driversuite/hitechnic-gyro-_s_m_u_x-test1_8c-example.html
-//const tMUXSensor HTGYRO = msensor_S2_4;
-
-// see xander's mux sample code... http://botbench.com/driversuite/lego-ultrasound-_s_m_u_x-test1_8c-example.html
-//const tMUXSensor LEGOUS2 = msensor_S2_2;
-//const tMUXSensor LEGOUS3 = msensor_S2_3;
-
+const tMUXSensor HTGYRO = msensor_S2_4;
+// see xander's mux sample code:  http://botbench.com/driversuite/lego-ultrasound-_s_m_u_x-test1_8c-example.html
+const tMUXSensor LEGOUS2 = msensor_S2_2;
+const tMUXSensor LEGOUS3 = msensor_S2_3;
 // see xander's light mux sample: http://botbench.com/driversuite/lego-light-_s_m_u_x-test1_8c-example.html
-//const tMUXSensor LEGOLS = msensor_S2_1;
+const tMUXSensor LEGOLS = msensor_S2_1;
 
 const int GREEN = 0;
 const int RED = 1;
@@ -174,10 +169,10 @@ void ExtendLightServo (void) {
     servo[servo2] = 110;
     }
 }
-/*
+
 void TrackBySonar (void) {
-	  int range2 = USreadDist(LEGOUS2); // SensorValue[sonar3];
-	  int range3 = USreadDist(LEGOUS3); // SensorValue[sonar4];
+	  int range2 = USreadDist(LEGOUS2);
+	  int range3 = USreadDist(LEGOUS3);
 	  nxtDisplayCenteredBigTextLine(1, "%3d cm ", range3);
 		nxtDisplayCenteredBigTextLine(6, "%3d cm ", range2);
     // move servo
@@ -188,7 +183,7 @@ void TrackBySonar (void) {
     }
     wait1Msec(ServoFreq);
 }
-*/
+
 
 void TurnLeft (int forwardOrBackward) {
           nxtDisplayTextLine(2, "turning left");
