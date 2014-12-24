@@ -22,64 +22,92 @@
 short speedMod = 2;
 short straifMod = 2;
 short turnMod = 2;
-short backMod = 2;
-short frontMod = 2;
+float backMod = 3;
+float frontMod = 2;
 short zero = 6;
-
+short nudge = 15;
 
 void initializeRobot(){
-	nMotorEncoder[lift] = 0;
+
   return;
 }
 void ySet(short speed){
 	speed /= speedMod;
-	motor[leftFront] = speed/frontMod;
-	motor[leftBack] = speed/backMod;
-	motor[rightFront] = speed/frontMod;
-	motor[rightBack] = speed/backMod;
+	motor[leftFront] = speed;
+	motor[leftBack] = speed;
+	motor[rightFront] = speed;
+	motor[rightBack] = speed;
 }
 void xSet(short speed){
 	speed /= straifMod;
-	motor[leftFront] = -speed;
+	motor[leftFront] = -speed/frontMod;
+	motor[leftBack] = speed/backMod;
+	motor[rightFront] = speed/frontMod;
+	motor[rightBack] = -speed/backMod;
+}
+void xdiagSet(short speed){
 	motor[leftBack] = speed;
 	motor[rightFront] = speed;
-	motor[rightBack] = -speed;
+}
+void negxdiagSet(short speed){
+	motor[rightBack] = speed;
+	motor[leftFront] = speed;
 }
 void turn(short speed){
 	speed /= turnMod;
-	motor[leftFront] = speed;
+	//motor[leftFront] = speed;
 	motor[leftBack] = speed;
-	motor[rightFront] = -speed;
+	//motor[rightFront] = -speed;
 	motor[rightBack] = -speed;
 }
 task main(){
   initializeRobot();
-  // wait for start of tele-op phase
+
   waitForStart();
-
-  //actual control of the robot
-
-
-  while (true){
+	while(true){
 		getJoystickSettings(joystick);
-		//code for robot panning controlled by the left joystick
-		if(joystick.joy1_y1 > zero){ //forwards
-			ySet(joystick.joy1_y1);
-		}else if(joystick.joy1_y1 < -zero){ //backwards
-			ySet(joystick.joy1_y1);
-		}else if(joystick.joy1_x1 < -zero){ //left
-			xSet(joystick.joy1_x1);
-		}else if(joystick.joy1_x1 > zero){ //right
-			xSet(joystick.joy1_x1);
-		}else if(joystick.joy1_x2 < -zero){ //left turn
-			turn(joystick.joy1_x2);
-		}else if(joystick.joy1_x2 > zero){ //right turn
-			turn(joystick.joy1_x2);
-		}else{
-			ySet(0);
-		}
 
-		//button actions
+		//code for controller 1 to move the robot forwards, backwards, straif left, straif right, turn right, and turn left
+		if(joystick.joy1_TopHat != -1){
+    	if(joystick.joy1_TopHat == 0){
+    		ySet(nudge);
+    	}else if(joystick.joy1_TopHat == 1){
+    		xdiagSet(nudge);
+    	}else if(joystick.joy1_TopHat == 2){
+    		xSet(nudge*2);
+    	}else if(joystick.joy1_TopHat == 3){
+    		negxdiagSet(-nudge);
+    	}else if(joystick.joy1_TopHat == 4){
+    		ySet(-nudge);
+    	}else if(joystick.joy1_TopHat == 5){
+    		xdiagSet(-nudge);
+    	}else if(joystick.joy1_TopHat == 6){
+    		xSet(-nudge*2);
+      }else if(joystick.joy1_TopHat == 7){
+      	xdiagSet(nudge);
+    	}
+    }else{
+			if(joystick.joy1_y1 > zero){ //forwards
+				ySet(joystick.joy1_y1);
+			}else if(joystick.joy1_y1 < -zero){ //backwards
+				ySet(joystick.joy1_y1);
+			}else if(joystick.joy1_x1 < -zero){ //left
+				xSet(joystick.joy1_x1);
+			}else if(joystick.joy1_x1 > zero){ //right
+				xSet(joystick.joy1_x1);
+			}else if(joystick.joy1_x2 < -zero){ //left turn
+				turn(joystick.joy1_x2);
+			}else if(joystick.joy1_x2 > zero){ //right turn
+				turn(joystick.joy1_x2);
+			}else{
+				ySet(0);
+			}
+		}
+		//nudge movement for controller 1;
+
+
+
+		//button actions for controller 1
 		switch(joystick.joy1_Buttons){
 			case 1:
 				break;
@@ -94,10 +122,10 @@ task main(){
 				servo[backLeftServo] = 190;
 				break;
 			case 6:
-				servo[backRightServo] = 190;
-	    	servo[backLeftServo] = 30;
 				break;
 			case 7:
+				servo[backRightServo] = 190;
+	    	servo[backLeftServo] = 30;
 				break;
 			case 8:
 				break;
@@ -105,40 +133,5 @@ task main(){
 				break;
 		}
 
-		if(joystick.joy1_TopHat != -1){
-    	if(joystick.joy1_TopHat == 0){
-				motor[beaterBar] = 30;
-    	}else if(joystick.joy1_TopHat == 1){
-    	}else if(joystick.joy1_TopHat == 2){
-    		motor[lift] = 100;
-    	}else if(joystick.joy1_TopHat == 3){
-    	}else if(joystick.joy1_TopHat == 4){
-				motor[beaterBar] = 0;
-				motor[lift] = 0;
-    	}else if(joystick.joy1_TopHat == 6){
-    		motor[lift] = -100;
-      }else if(joystick.joy1_TopHat == 5){
-    	}else if(joystick.joy1_TopHat == 7){
-    	}
-    }
-
-    /*
-    	JOYSTICK_2!!!!!!!!!!!!!!
-    */
-    if(joystick.joy2_y1 > zero){ //forwards
-
-		}else if(joystick.joy2_y1 < -zero){ //backwards
-
-		}else if(joystick.joy2_x1 < -zero){ //left
-
-		}else if(joystick.joy2_x1 > zero){ //right
-
-		}else if(joystick.joy2_x2 < -zero){ //left turn
-
-		}else if(joystick.joy2_x2 > zero){ //right turn
-
-		}else{
-
-		}
 	}
 }
