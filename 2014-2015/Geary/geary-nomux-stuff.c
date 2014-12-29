@@ -23,8 +23,6 @@ const int Forward = -1;
 const int Backward = 1;
 const int TurnTimeLimit = 3500; // millisecs
 
-int DriveByButtonSpeed = 10;
-
 // see xander's gyro mux example: http://botbench.com/driversuite/hitechnic-gyro-_s_m_u_x-test1_8c-example.html
 //const tMUXSensor HTGYRO = msensor_S2_4;
 
@@ -191,6 +189,13 @@ void TrackBySonar (void) {
 void TurnLeft (int forwardOrBackward) {
           nxtDisplayTextLine(2, "turning left");
           HTSPBwriteIO(HTSPB, 0x1); // green means starboard, i.e. turn left, was... nxtDisplayTextLine(1, "turn Left");
+          motor[left] = DriveByButtonSpeed * 1 / 100 * forwardOrBackward;
+          motor[right] = DriveByButtonSpeed * forwardOrBackward;
+}
+
+void TurnLeftGeary (int forwardOrBackward) {
+          nxtDisplayTextLine(2, "turning left");
+          HTSPBwriteIO(HTSPB, 0x1); // green means starboard, i.e. turn left, was... nxtDisplayTextLine(1, "turn Left");
           motor[left] = DriveByButtonSpeed * 1 / 8 * forwardOrBackward;
           motor[right] = DriveByButtonSpeed * 10 * forwardOrBackward;
 }
@@ -198,23 +203,49 @@ void TurnLeft (int forwardOrBackward) {
 void TurnRight (int forwardOrBackward) {
           nxtDisplayTextLine(2, "turning right");
           HTSPBwriteIO(HTSPB, 0x2); // red means port, i.e. turn right, was... nxtDisplayTextLine(1, "turn Right");
+          motor[left] = DriveByButtonSpeed * forwardOrBackward;
+          motor[right] =  DriveByButtonSpeed* 1 / 8 * forwardOrBackward;
+}
+
+void TurnRightGeary (int forwardOrBackward) {
+          nxtDisplayTextLine(2, "turning right");
+          HTSPBwriteIO(HTSPB, 0x2); // red means port, i.e. turn right, was... nxtDisplayTextLine(1, "turn Right");
           motor[left] = DriveByButtonSpeed * 10 * forwardOrBackward;
           motor[right] =  DriveByButtonSpeed* 1 / 10 * forwardOrBackward;
 }
 
 void RotateLeft (int speed) {
-          nxtDisplayTextLine(3, "rotating left");
+          nxtDisplayTextLine(2, "rotating left");
+          motor[left] = speed * Backward;
+          motor[right] = speed * Forward * 3/2;
+}
+
+void RotateRight (int speed) {
+          nxtDisplayTextLine(2, "rotating right");
+          motor[left] = speed * Forward * 3/2;
+          motor[right] = speed * Backward;
+}
+
+void RotateLeftGeary (int speed) {
+          nxtDisplayTextLine(2, "rotating left");
           motor[left] = 0; // speed * 2 / 5 * Backward;
           motor[right] = speed * Forward;
 }
 
-void RotateRight (int speed) {
-          nxtDisplayTextLine(3, "rotating right");
+void RotateRightGeary (int speed) {
+          nxtDisplayTextLine(2, "rotating right");
           motor[left] = speed * Forward;
           motor[right] = 0; // speed* 2 / 5 * Backward;
 }
 
 void GoStraight (int forwardOrBackward) {
+          nxtDisplayTextLine(2, "going straight");
+          LightBothLeds();
+          motor[left] = DriveByButtonSpeed * forwardOrBackward;
+          motor[right] = DriveByButtonSpeed * forwardOrBackward;
+}
+
+void GoStraightGeary (int forwardOrBackward) {
           nxtDisplayTextLine(3, "going straight");
           LightBothLeds();
           motor[left] = DriveByButtonSpeed * forwardOrBackward * 7/4;
@@ -242,7 +273,7 @@ void GoStraightByGyro (float straightHead) {
 
 void GoStraightWithoutGyro () {
       	// stay on heading from before button was pressed
-          TurnRight(Forward);
+          GoStraight(Forward);
 }
 
 void GoBackByGyro (float straightHead) {
@@ -265,7 +296,7 @@ task limitMotorTime() {
     StopAllTasks();
 }
 
-void Turn180 (void) {
+void Turn180Geary (void) {
 	LightsOff();
 	float startHead = currHeading;
 	StartTask (limitMotorTime);
@@ -291,7 +322,35 @@ void Turn180 (void) {
   StopMotors();
 	StopTask (limitMotorTime);
 }
-/*
+
+void Turn180 (void) {
+	LightsOff();
+	float startHead = currHeading;
+	StartTask (limitMotorTime);
+	wait1Msec(100);
+	// currHeading starts at zero and goes up as we turn right
+	// startHead is zero, so SubtractFromCurrHeading(startHead) == CurrHeading
+	do {
+		//nxtDisplayTextLine(3, "head: %3.0f", currHeading);
+		//nxtDisplayTextLine(4, "target: %3.0f", startHead);
+		//nxtDisplayTextLine(5, "diff: %3.0f", SubtractFromCurrHeading (startHead));
+		RotateRight (30);
+		wait1Msec (10);
+	} while (SubtractFromCurrHeading (startHead) < 150 && SubtractFromCurrHeading (startHead) >= -5);
+  StopMotors();
+	StopTask (limitMotorTime);
+}
+
+task AvoidWalls() {
+    while(SensorValue[sonar] > 10)   // While the Sonar Sensor readings are less than the specified, 'distance_in_cm':
+      { wait1Msec(300); }
+    StopMotors();
+    PlayTone(1000,200);
+    wait1Msec(500);
+    StopAllTasks();
+}
+
+/* mux version
 task AvoidWalls() {
     while((USreadDist(LEGOUS2) > 10) && (USreadDist(LEGOUS3) > 10)) { wait1Msec(300); }
     StopMotors();
