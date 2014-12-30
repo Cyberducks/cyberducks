@@ -37,19 +37,29 @@ main ()
   StartTask(AvoidWalls);
   wait1Msec(300);
 
+  InitProtoboardLights();
+  wait1Msec(1000);
+
   nMotorEncoder[right] = 0;
   while (nMotorEncoder[right] > -onewayDistance) {
     GoStraightByGyro(startHeading);
-    //GoStraightWithoutGyro();
     nxtDisplayTextLine(6, "enc: %d", nMotorEncoder[right]);
 	}
   StopMotors();
 
   StopTask(getHeading);
+  wait1Msec(300);
   StartTask(getHeading);
   wait1Msec(300);
 
-	Turn180();
+	Turn180(10);
+
+  nMotorEncoder[right] = 0;
+  while (nMotorEncoder[right] > -onewayDistance/2) {
+    GoStraightByGyro(flipHeading);
+    nxtDisplayTextLine(6, "enc: %d", nMotorEncoder[right]);
+	}
+  StopMotors();
 
   StopAllTasks ();
 }

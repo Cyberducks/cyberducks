@@ -240,14 +240,14 @@ void RotateRightGeary (int speed) {
 
 void GoStraight (int forwardOrBackward) {
           nxtDisplayTextLine(2, "going straight");
-          LightBothLeds();
+          LightsOff();
           motor[left] = DriveByButtonSpeed * forwardOrBackward;
           motor[right] = DriveByButtonSpeed * forwardOrBackward;
 }
 
 void GoStraightGeary (int forwardOrBackward) {
           nxtDisplayTextLine(3, "going straight");
-          LightBothLeds();
+          LightsOff();
           motor[left] = DriveByButtonSpeed * forwardOrBackward * 7/4;
           motor[right] = DriveByButtonSpeed * forwardOrBackward;
 }
@@ -255,6 +255,7 @@ void GoStraightGeary (int forwardOrBackward) {
 void StopMotors (void) {
           motor[left] = 0;
           motor[right] = 0;
+          LightsOff();
 }
 
 void GoStraightByGyro (float straightHead) {
@@ -323,7 +324,7 @@ void Turn180Geary (void) {
 	StopTask (limitMotorTime);
 }
 
-void Turn180 (void) {
+void Turn180 (int tolerance) {
 	LightsOff();
 	float startHead = currHeading;
 	StartTask (limitMotorTime);
@@ -336,7 +337,7 @@ void Turn180 (void) {
 		//nxtDisplayTextLine(5, "diff: %3.0f", SubtractFromCurrHeading (startHead));
 		RotateRight (30);
 		wait1Msec (10);
-	} while (SubtractFromCurrHeading (startHead) < 150 && SubtractFromCurrHeading (startHead) >= -5);
+	} while (SubtractFromCurrHeading (startHead) < (180-tolerance) && SubtractFromCurrHeading (startHead) >= (0-tolerance));
   StopMotors();
 	StopTask (limitMotorTime);
 }

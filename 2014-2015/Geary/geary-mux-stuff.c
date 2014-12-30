@@ -288,7 +288,7 @@ void Turn180 (void) {
   StopMotors();
 	StopTask (limitMotorTime);
 }
-/*
+
 task AvoidWalls() {
     while((USreadDist(LEGOUS2) > 10) && (USreadDist(LEGOUS3) > 10)) { wait1Msec(300); }
     StopMotors();
@@ -296,4 +296,3 @@ task AvoidWalls() {
     wait1Msec(500);
     StopAllTasks();
 }
-*/
