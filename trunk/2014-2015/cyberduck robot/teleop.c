@@ -25,6 +25,7 @@ short turnMod = 2;
 short backMod = 2;
 short frontMod = 2;
 short zero = 6;
+short liftPosition = 0;
 bool lc = true;
 
 void initializeRobot(){
@@ -52,17 +53,7 @@ void turn(short speed){
 	motor[rightFront] = -speed;
 	motor[rightBack] = -speed;
 }
-void liftCheck(){
 
-	if(nMotorEncoder[lift] > 6 * 360){
-		lc = false;
-	}else if(nMotorEncoder[lift] < -2){
-		lc = false;
-	}else{
-		lc = true;
-	}
-
-}
 task main(){
   initializeRobot();
 
@@ -134,5 +125,14 @@ task main(){
     	}
     }
 
+    // the secound controller that does the 80-20 lifts and other attachments that are not the back goal clips
+
+		if(joystick.joy2_y1 > zero){ //increment up
+
+		}else if(joystick.joy2_y1 < -zero){ //increment down
+
+		}
+
+		}
 	}
 }
