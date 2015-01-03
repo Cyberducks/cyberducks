@@ -112,13 +112,13 @@ task main(){
 				break;
 		}
 
-		if(joystick.joy1_TopHat != -1){
-    	if(joystick.joy1_TopHat == 0){
-				motor[beaterBar] = -75;
+		if(joystick.joy2_TopHat != -1){
+    	if(joystick.joy2_TopHat == 0){
+				motor[beaterBar] = 35;
     	}else if(joystick.joy1_TopHat == 1){
     	}else if(joystick.joy1_TopHat == 2){
     	}else if(joystick.joy1_TopHat == 3){
-    	}else if(joystick.joy1_TopHat == 4){
+    	}else if(joystick.joy2_TopHat == 4){
 				motor[beaterBar] = 0;
     	}else if(joystick.joy1_TopHat == 6){
       }else if(joystick.joy1_TopHat == 5){
