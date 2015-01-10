@@ -1,8 +1,8 @@
-#include "../drivers/hitechnic-sensormux.h"  // needs to come before gyro.h
-#include "../drivers/hitechnic-gyro.h"
-#include "../drivers/lego-light.h"
-#include "../drivers/lego-ultrasound.h"
-#include "../drivers/hitechnic-superpro.h"
+#include "/drivers/hitechnic-sensormux.h"  // needs to come before gyro.h
+#include "/drivers/hitechnic-gyro.h"
+#include "/drivers/lego-light.h"
+#include "/drivers/lego-ultrasound.h"
+#include "/drivers/hitechnic-superpro.h"
 
 
 // ********************************* globals ************************************
