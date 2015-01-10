@@ -30,7 +30,7 @@
  *
  * License: You may use this code as you wish, provided you give credit where its due.
  *
- * THIS CODE WILL ONLY WORK WITH ROBOTC VERSION 3.59 AND HIGHER.
+ * THIS CODE WILL ONLY WORK WITH ROBOTC VERSION 3.59 AND HIGHER. 
 
  * \author Xander Soldaat (mightor_at_gmail.com)
  * \date 06 April 2010
@@ -63,6 +63,7 @@
 #define HTIRS2_AC_SSTR3    0x0A      /*!< AC Sensor 2 signal strength above average */
 #define HTIRS2_AC_SSTR4    0x0B      /*!< AC Sensor 3 signal strength above average */
 #define HTIRS2_AC_SSTR5    0x0C      /*!< AC Sensor 4 signal strength above average */
+
 
 /*!< AC DSP modes */
 typedef enum {
