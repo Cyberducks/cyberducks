@@ -1,9 +1,10 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  none,     none)
 #pragma config(Hubs,  S2, HTServo,  HTMotor,  none,     none)
+#pragma config(Sensor, S3,     GYRO,           sensorAnalogInactive)
 #pragma config(Sensor, S4,     HTSMUX,         sensorI2CCustom)
 #pragma config(Motor,  mtr_S1_C1_1,     rightFront,    tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C1_2,     rightBack,     tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_1,     leftBack,      tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     rightBack,     tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C2_1,     leftBack,      tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C2_2,     leftFront,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S2_C2_1,     beaterBar,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S2_C2_2,     lift,          tmotorTetrix, openLoop, encoder)
@@ -17,13 +18,62 @@
 
 #include "../drivers-3x/hitechnic-sensormux.h"
 #include "../drivers-3x/hitechnic-irseeker-v2.h"
+#include "../drivers-3x/hitechnic-gyro.h"
 
 const tMUXSensor IRS1 = msensor_S4_1;
 const tMUXSensor IRS2 = msensor_S4_2;
 
-task main()
-{
+float currHeading = 0;
 
+// Task to keep track of the current heading using the HT Gyro
+task getHeading () {
+	float delTime = 0;
+	float prevHeading = 0;
+	float curRate = 0;
+
+  HTGYROstartCal(GYRO);
+  PlaySound(soundBeepBeep);
+  while (true) {
+    time1[T1] = 0;
+    curRate = HTGYROreadRot(GYRO);
+    if (abs(curRate) > 3) {
+      prevHeading = currHeading;
+      currHeading = prevHeading + curRate * delTime;
+      if (currHeading > 360) currHeading -= 360;
+      else if (currHeading < 0) currHeading += 360;
+    }
+    wait1Msec(5);
+    delTime = ((float)time1[T1]) / 1000;
+    //delTime /= 1000;
+  }
+}
+task forwardInc(int inches, float power){
+	nMotorEncoder[rightBack] = 0;
+  nMotorEncoder[leftBack] = 0;
+
+  int head = currHeading;
+  int ti = 6;
+
+  motor[rightBack] = power;
+  motor[leftBack] = power;
+
+  while(nMotorEncoder[rightBack] < (inches/8.37758040957278)*360 || nMotorEncoder[leftBack] < (inches/8.37758040957278)*360){
+  	if(head+4 > currHeading){
+  		motor[rightBack] = power+ti;
+  	}else if(head-4 > currHeading){
+  		motor[leftBack] = power-ti;
+  	}else{
+  		motor[rightBack] = power;
+  		motor[leftBack] = power;
+  	}
+  }
+}
+void initializeRobot(){
+	StartTask(getHeading);
+}
+task main(){
+	initializeRobot();
+	waitForStart();
 
 
 }
