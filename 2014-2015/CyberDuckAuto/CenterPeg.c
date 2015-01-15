@@ -17,10 +17,10 @@
 
 #include "../drivers-3x/hitechnic-sensormux.h"
 #include "../drivers-3x/hitechnic-irseeker-v2.h"
-
+#include "../drivers-3x/hitechnic-gyro.h"
 const tMUXSensor IRS1 = msensor_S4_1;
 const tMUXSensor IRS2 = msensor_S4_2;
-
+tMUXSemsor Gyro
 task main()
 {
 
