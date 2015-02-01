@@ -27,8 +27,11 @@
 //const tMUXSensor IRS1 = msensor_S4_1;
 //const tMUXSensor IRS2 = msensor_S4_2;
 
+float GyroTolerance = 6;
 float currHeading = 0;
-
+float ofset = 28;
+float ti = 15;
+const short ROTDISTANCE = 8.37758040957278;
 // Task to keep track of the current heading using the HT Gyro
 task getHeading () {
 	float delTime = 0;
@@ -51,37 +54,120 @@ task getHeading () {
     //delTime /= 1000;
   }
 }
+// heading is never negative, but it can flip from 1 to 359, so do modulus 180
+float SubtractFromCurrHeading (float x) {
+  float result = 0.0;
+  float ch = currHeading;
+  float diff = abs(ch - x);
+  if (diff >= 180) { // more than 180d neg apart, so flip
+    result = 360.0 - diff;
+    if (x < 180) { result = -result; }
+  } else {
+    result = ch - x;
+  }
+  return result;
+}
+void xSet(float power){
+	motor[rightBack] = power;
+	motor[leftBack] = power;
+	motor[leftFront] = power;
+	motor[rightFront] = power;
+}
+void GoStraightByGyro (float straightHead, float power) {
+      	// stay on heading from before button was pressed
+        if (SubtractFromCurrHeading(straightHead) > GyroTolerance) {
+          motor[rightBack] = power+ti;
+	  			motor[rightFront] = power+ti;
+      } else if (SubtractFromCurrHeading(straightHead) < -GyroTolerance) {
+        	motor[leftBack] = power+ti;
+	  			motor[leftFront] = power+ti;
+      } else  {
+          xSet(power);
+      }
+}
 void forwardInc(float inches, float power){
 	nMotorEncoder[rightBack] = 0;
   nMotorEncoder[leftBack] = 0;
 
-  int head = currHeading;
-  int ti = 15;
+  //int head = currHeading;
+	if(inches > 0){
+	  GoStraightByGyro(currHeading, power);
 
-  motor[rightBack] = power;
-  motor[leftBack] = power;
+	  while(nMotorEncoder[rightBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] < (inches/ROTDISTANCE)*360){
+	  	/*
+	  	if(head+4 < currHeading){
+	  		motor[rightBack] = power+ti;
+	  		motor[rightFront] = power+ti;
+	  	}else if(head-4 > currHeading){
+	  		motor[leftBack] = power-ti;
+	  		motor[leftFront] = power-ti;
+	  	}else{
+	  		xSet(power);
+	  	}
+	  	*/
 
-  while(nMotorEncoder[rightBack] < (inches/8.37758040957278)*360 || nMotorEncoder[leftBack] < (inches/8.37758040957278)*360){
-  	if(head+4 > currHeading){
-  		motor[rightBack] = power+ti;
-  		motor[rightFront] = power+ti;
-  	}else if(head-4 > currHeading){
-  		motor[leftBack] = power-ti;
-  		motor[leftFront] = power-ti;
-  	}else{
-  		motor[rightBack] = power;
-  		motor[leftBack] = power;
-  		motor[leftFront] = power;
-  		motor[rightFront] = power;
-  	}
-  }
+	  }
+	}else{
+		GoStraightByGyro(currHeading, -power);
+	  while(nMotorEncoder[rightBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] > (inches/ROTDISTANCE)*360){
+	  	/*
+	  	if(head+4 < currHeading){
+	  		motor[rightBack] = power-ti;
+	  		motor[rightFront] = power-ti;
+	  	}else if(head-4 > currHeading){
+	  		motor[leftBack] = power+ti;
+	  		motor[leftFront] = power+ti;
+	  	}else{
+	  		xSet(power);
+	  	}
+	  	*/
+	  }
+	}
+	xSet(0);
 }
+void turnDeg(float deg, float power){
+	if(deg > 0){
+		currHeading -= ofset;
+		motor[leftBack] = power;
+  	motor[rightBack] = -power;
+  	while(deg >= currHeading){
+			wait1Msec(1);
+		}
+	}else{
+	  currHeading += ofset;
+		motor[leftBack] = -power;
+  	motor[rightBack] = power;
+  	while(deg <= currHeading){
+			wait1Msec(1);
+		}
+	}
+	xSet(0);
+}
+
 void initializeRobot(){
-	StartTask(getHeading);
+	  servo[topServo] = 235;
 }
 task main(){
 	initializeRobot();
-	//waitForStart();
-	forwardInc(4800, 35);
+	waitForStart();
+	StartTask(getHeading);
+	//turnDeg(15, 30);
+	forwardInc(80, 20);
+	//wait1Msec(1000);
+	//turnDeg(180, 40);
+	servo[backRightServo] = 190;
+	servo[backLeftServo] = 0;
+	//forwardInc(-36, 20);
+	//servo[backRightServo] = 50;
+	//servo[backLeftServo] = 127;
+	//servo[backLeftServo] = 256;
+	/*
+	wait1Msec(3000);
+	motor[lift] = 100;
+  wait1Msec(5000);
+  motor[lift] = 0;
+  servo[topServo] = 100;
+  */
+
 
 }
