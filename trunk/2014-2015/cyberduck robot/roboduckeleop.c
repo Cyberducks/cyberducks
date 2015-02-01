@@ -29,6 +29,7 @@ float liftmod = 75;
 
 void initializeRobot(){
 	nMotorEncoder[lift] = 0;
+	servo[topServo] = 235;
 	servo[backRightServo] = 50;
 	servo[backLeftServo] = 256;
 	wait1Msec(500);
