@@ -17,7 +17,9 @@
 
 task main()
 {
+	nMotorEncoder[lift] = 0;
 	while(true){
+		nxtDisplayTextLine(3, "head: %3.0f", nMotorEncoder[lift]/4);
 		if(nNxtButtonPressed != -1){
 			if(nNxtButtonPressed == 1){
 				motor[lift] = 50;
