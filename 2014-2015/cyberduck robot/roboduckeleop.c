@@ -27,6 +27,10 @@ short frontMod = 2;
 short zero = 6;
 float liftmod = 75;
 
+float high = -11.25*360*4;
+float mid = -8*360*4;
+float low = -4.5*360*4;
+
 void initializeRobot(){
 	nMotorEncoder[lift] = 0;
 	servo[topServo] = 235;
@@ -34,7 +38,30 @@ void initializeRobot(){
 	servo[backLeftServo] = 256;
 	wait1Msec(500);
 	servo[backLeftServo] = 127;
-  return;
+  motor[beaterBar] = 50;
+  wait1Msec(1000);
+  motor[beaterBar] = 0;
+}
+void liftPos(float x){
+	servo[topServo] = 235;
+	if(x == 1){
+		x = low;
+	}else if(x == 2){
+		x = mid;
+	}else if(x == 3){
+		x = high;
+	}else if(x == 0){
+		x = 0;
+	}
+	//remember that x is negative bc lift up is counting down and lift down is counting up probs
+	if(nMotorEncoder[lift] >= x){
+			motor[lift] = 100;
+			while(nMotorEncoder[lift] >= x){}
+	}else if(nMotorEncoder[lift] <= x){
+   		motor[lift] = -100;
+   		while(nMotorEncoder[lift] <= x){}
+	}
+	motor[lift] = 0;
 }
 void ySet(short speed){
 	speed /= speedMod;
@@ -121,47 +148,41 @@ task main(){
 
 		if(joystick.joy2_TopHat != -1){
     	if(joystick.joy2_TopHat == 0){
-				motor[beaterBar] = 50;
-    	}else if(joystick.joy1_TopHat == 1){
-    	}else if(joystick.joy1_TopHat == 2){
-    	}else if(joystick.joy1_TopHat == 3){
+				liftPos(2);
+				//wait1Msec(400);
+    	}else if(joystick.joy2_TopHat == 1){
+    	}else if(joystick.joy2_TopHat == 2){
+    		liftPos(3);
+				//wait1Msec(400);
+    	}else if(joystick.joy2_TopHat == 3){
     	}else if(joystick.joy2_TopHat == 4){
-				motor[beaterBar] = 0;
-    	}else if(joystick.joy1_TopHat == 6){
-      }else if(joystick.joy1_TopHat == 5){
-    	}else if(joystick.joy1_TopHat == 7){
+				liftPos(0);
+				//wait1Msec(400);
+    	}else if(joystick.joy2_TopHat == 6){
+    		liftPos(1);
+				//wait1Msec(400);
+      }else if(joystick.joy2_TopHat == 5){
+    	}else if(joystick.joy2_TopHat == 7){
     	}
     }
 
     /*
     	JOYSTICK_2!!!!!!!!!!!!!!
     */
-    switch(joystick.joy2_Buttons){
-    	case 0:
+    if(joystick.joy2_Buttons & 0x04){
+    	//servo[topServo] = 235;
+    	motor[beaterBar] = 50;
+    }else if(joystick.joy2_Buttons & 0x08){
+    	//servo[topServo] = 100;
+    	motor[beaterBar] = 0;
+    }else if(joystick.joy2_Buttons & 0x01){
+    	//motor[beaterBar] = 50;
+    	servo[topServo] = 235;
+    }else if(joystick.joy2_Buttons & 0x02){
+    	//motor[beaterBar] = 0;
+    	servo[topServo] = 100;
+    }
 
-				break;
-			case 1:
-				servo[topServo] = 235;
-				break;
-			case 2:
-				servo[topServo] = 100;
-				break;
-			case 3:
-				servo[topServo] = 215;
-				break;
-			case 4:
-				break;
-			case 5:
-				break;
-			case 6:
-				break;
-			case 7:
-				break;
-			case 8:
-				break;
-			default:
-				break;
-		}
 
     if(joystick.joy2_y1 > zero){ //up
 			if(liftCheck(liftmod)){
