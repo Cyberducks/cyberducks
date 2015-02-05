@@ -28,39 +28,16 @@
 
 #include "drivers-3x/hitechnic-sensormux.h"
 #include "drivers-3x/hitechnic-eopd.h"
-
-// The sensor is connected to the first port
-// of the SMUX which is connected to the NXT port S1.
-// To access that sensor, we must use msensor_S1_1.  If the sensor
-// were connected to 3rd port of the SMUX connected to the NXT port S4,
-// we would use msensor_S4_3
+#include "drivers-3x/lego-light.h"
 
 // Give the sensor a nice easy to use name
-const tMUXSensor HTEOPD = msensor_S4_4;
+const tMUXSensor HTEOPD = msensor_S4_3;
+const tMUXSensor LEGOLS = msensor_S4_4;
+
 
 task main() {
   int _raw = 0;
   int _processed = 0;
-
-  // Standard range is set to short range
-  bool shortrange = true;
-
-  nNxtButtonTask  = -2;
-
-  eraseDisplay();
-  nxtDisplayCenteredTextLine(0, "HiTechnic");
-  nxtDisplayCenteredBigTextLine(1, "EOPD");
-  nxtDisplayCenteredTextLine(3, "SMUX Test");
-  nxtDisplayCenteredTextLine(5, "Connect SMUX to");
-  nxtDisplayCenteredTextLine(6, "S1 and sensor to");
-  nxtDisplayCenteredTextLine(7, "SMUX Port 1");
-  wait1Msec(2000);
-
-  nxtDisplayCenteredTextLine(5, "Press enter to");
-  nxtDisplayCenteredTextLine(6, "switch between");
-  nxtDisplayCenteredTextLine(7, "ranges");
-  wait1Msec(2000);
-  eraseDisplay();
 
   // Set the sensor to short range
   HTEOPDsetShortRange(HTEOPD);
@@ -78,8 +55,10 @@ task main() {
       nxtDisplayTextLine(3, "Raw :  %4d", _raw);
       wait1Msec(50);
       if (_processed > 22) {
+      	      LSsetActive(LEGOLS); // turn light on
 	            PlaySound(soundBeepBeep);
 	            while(bSoundActive);
+	            LSsetInactive(LEGOLS); // turn light off
 
 	        } // if ball close
 } // while true
