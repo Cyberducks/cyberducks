@@ -23,9 +23,13 @@
 #include "../drivers-3x/hitechnic-sensormux.h"
 #include "../drivers-3x/hitechnic-irseeker-v2.h"
 #include "../drivers-3x/hitechnic-gyro.h"
+#include "../drivers-3x/hitechnic-eopd.h"
+#include "../drivers-3x/lego-light.h"
 
 const tMUXSensor IRS1 = msensor_S4_1;
 const tMUXSensor IRS2 = msensor_S4_2;
+const tMUXSensor HTEOPD = msensor_S4_3;
+const tMUXSensor LEGOLS = msensor_S4_4;
 
 float GyroTolerance = 6;
 float currHeading = 0;
@@ -37,7 +41,31 @@ float high = -11.25*360*4;
 float mid = -8*360*4;
 float low = -4.5*360*4;
 // Task to keep track of the current heading using the HT Gyro
-task getHeading () {
+int acS1a, acS2a, acS3a, acS4a, acS5a = 0;
+int acS1b, acS2b, acS3b, acS4b, acS5b = 0;
+int th = 15;
+task infared(){
+	int _dirAC1 = 0;
+  //int 1acS1, 1acS2, 1acS3, 1acS4, 1acS5 = 0;
+  int _dirAC2 = 0;
+  //int 2ac2S1, 2acS2, 2acS3, 2acS4, 2acS5 = 0;
+
+	while(true){
+		_dirAC1 = HTIRS2readACDir(IRS1);
+    if (_dirAC1 < 0)
+      break; // I2C read error occurred
+
+    _dirAC2 = HTIRS2readACDir(IRS2);
+    if (_dirAC2 < 0)
+      break; // I2C read error occurred
+
+    if (!HTIRS2readAllACStrength(IRS1, acS1a, acS2a, acS3a, acS4a, acS5a))
+      break; // I2C read error occurred
+    if (!HTIRS2readAllACStrength(IRS2, acS1b, acS2b, acS3b, acS4b, acS5b))
+      break; // I2C read error occurred
+	}
+}
+task getHeading(){
 	float delTime = 0;
 	float prevHeading = 0;
 	float curRate = 0;
@@ -154,42 +182,8 @@ void turnDeg(float deg, float power){
 	}
 	xSet(0);
 }
-
 void initializeRobot(){
 	nMotorEncoder[lift] = 0;
-}
-task ir(){
-	int _dirAC1 = 0;
-  int acS1, acS2, acS3, acS4, acS5 = 0;
-  int _dirAC2 = 0;
-  int ac2S1, ac2S2, ac2S3, ac2S4, ac2S5 = 0;
-  int th = 15;
-	while(true){
-		_dirAC1 = HTIRS2readACDir(IRS1);
-    if (_dirAC1 < 0)
-      break; // I2C read error occurred
-
-    _dirAC2 = HTIRS2readACDir(IRS2);
-    if (_dirAC2 < 0)
-      break; // I2C read error occurred
-
-    if (!HTIRS2readAllACStrength(IRS1, acS1, acS2, acS3, acS4, acS5 ))
-      break; // I2C read error occurred
-    if (!HTIRS2readAllACStrength(IRS2, ac2S1, ac2S2, ac2S3, ac2S4, ac2S5 ))
-      break; // I2C read error occurred
-
-    if(ac2S3 - th > acS3){
-
-    }else if(ac2S3 + th < acS3){
-
-    }else if(ac2S3 + ac2S3 /2 < 5){
-
-    }else{
-
-
-    }
-
-	}
 }
 void liftPos(float x){
 	servo[topServo] = 235;
@@ -211,26 +205,74 @@ void liftPos(float x){
 	motor[lift] = 0;
 	servo[topServo] = 100;
 }
+
+
+task irBeep(){
+
+	if(th > (acS2a+acS4b/2)+10){
+		while(true){
+			int ir1 = acS1a+acS2a+acS3a+acS4a+acS5a;
+			int ir2 = acS1b+acS2b+acS3b+acS4b+acS5b;
+			ir1 = ir1/5;
+			ir2 = ir2/5;
+		 	PlayImmediateTone(ir1+ir2/2, 10);
+		}
+	}
+}
+task eopd(){
+	int _raw = 0;
+  int _processed = 0;
+
+  // Set the sensor to short range
+  HTEOPDsetShortRange(HTEOPD);
+
+  while(true){
+	  // Read the raw sensor value
+    _raw = HTEOPDreadRaw(HTEOPD);
+    // read the processed value which is linear with
+    // the distance detected.  Use the processed value
+    // when you want to determine distance to an object
+    _processed = HTEOPDreadProcessed(HTEOPD);
+    nxtDisplayClearTextLine(3);
+    nxtDisplayClearTextLine(4);
+    nxtDisplayTextLine(4, "Proc:  %4d", _processed);
+    nxtDisplayTextLine(3, "Raw :  %4d", _raw);
+    wait1Msec(50);
+    if (_processed > 41) {
+      LSsetActive(LEGOLS); // turn light on
+      PlaySound(soundBeepBeep);
+      while(bSoundActive){};
+      LSsetInactive(LEGOLS); // turn light off
+    } // if ball close
+  }
+}
+
 task main()
 {
 	servo[topServo] = 235;
 	initializeRobot();
+	th = (acS2a+acS4b/2)+5;
+	//StartTask(infared);
+	//StartTask(eopd);
+	//StartTask(irBeep);
+
 	while(true){
 		if(nNxtButtonPressed != -1){
-			if(nNxtButtonPressed == 1){
+			if(nNxtButtonPressed == 1 && nNxtButtonPressed == 2){
+				liftPos(0);
+			}else if(nNxtButtonPressed == 1){
 				//left
 				liftPos(1);
-				wait1Msec(1000);
+				wait1Msec(2000);
 			}else if(nNxtButtonPressed == 2){
 				//right
 				liftPos(3);
-				wait1Msec(1000);
+				wait1Msec(2000);
 			}else if(nNxtButtonPressed == 3){
 				//middle
 				liftPos(2);
-				wait1Msec(1000);
+				wait1Msec(2000);
 			}
 		}
-
 	}
 }

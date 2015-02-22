@@ -56,7 +56,8 @@ task main() {
       wait1Msec(50);
       if (_processed > 22) {
       	      LSsetActive(LEGOLS); // turn light on
-	            PlaySound(soundBeepBeep);
+	            PlaySound(1024, 50);
+	            nxtDisplayTextLine(5, "df :  %4d", _raw);
 	            while(bSoundActive);
 	            LSsetInactive(LEGOLS); // turn light off
 

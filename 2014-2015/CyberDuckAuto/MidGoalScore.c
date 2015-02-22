@@ -34,7 +34,7 @@ float ti = 20;
 const short ROTDISTANCE = 8.37758040957278;
 
 float high = -11.25*360*4;
-float mid = -8*360*4;
+float mid = -8.25*360*4;
 float low = -4.5*360*4;
 // Task to keep track of the current heading using the HT Gyro
 task getHeading () {
@@ -178,6 +178,7 @@ void initializeRobot(){
 }
 task main(){
 	initializeRobot();
+	wait1Msec(200);
 	waitForStart();
 	StartTask(getHeading);
 	wait1Msec(500);
@@ -206,8 +207,8 @@ task main(){
 	*/
 	wait1Msec(500);
 	turnDeg(15, 20);
-	forwardInc(175, 40);
-	turnDeg(180, 20);
+	forwardInc(175, 50);
+	turnDeg(180, 30);
 	//forwardInc(-36, 15);
 
 
