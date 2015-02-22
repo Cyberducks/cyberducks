@@ -24,7 +24,7 @@ short straifMod = 2;
 short turnMod = 1;
 short backMod = 2;
 short frontMod = 2;
-short zero = 6;
+short zero = 20;
 float liftmod = 75;
 
 float high = -11.25*360*4;
@@ -42,6 +42,7 @@ void initializeRobot(){
   wait1Msec(1000);
   motor[beaterBar] = 0;
 }
+float xx = 0;
 void liftPos(float x){
 	servo[topServo] = 235;
 	if(x == 1){
@@ -53,15 +54,9 @@ void liftPos(float x){
 	}else if(x == 0){
 		x = 0;
 	}
+	xx = x;
 	//remember that x is negative bc lift up is counting down and lift down is counting up probs
-	if(nMotorEncoder[lift] >= x){
-			motor[lift] = 100;
-			while(nMotorEncoder[lift] >= x){}
-	}else if(nMotorEncoder[lift] <= x){
-   		motor[lift] = -100;
-   		while(nMotorEncoder[lift] <= x){}
-	}
-	motor[lift] = 0;
+
 }
 void ySet(short speed){
 	speed /= speedMod;
@@ -88,14 +83,25 @@ bool liftCheck(float x){
 	}
 	return true;
 }
+void servoPos(short x, bool b){
+	servo[backLeftServo] = x;
+	if(b){
+		servo[backRightServo] = 256;
+		if(ServoValue[backRightServo] > servoTarget[backRightServo]){
+				servo[backRightServo] = 127;
+		}
+	}else{
+		servo[backRightServo] = 0;
+		if(ServoValue[backRightServo] < servoTarget[backRightServo]){
+				servo[backRightServo] = 127;
+		}
+	}
+}
 task main(){
   initializeRobot();
   // wait for start of tele-op phase
   waitForStart();
-
   //actual control of the robot
-
-
   while (true){
 		getJoystickSettings(joystick);
 		//code for robot panning controlled by the left joystick
@@ -117,30 +123,11 @@ task main(){
 
 		//button actions
 		switch(joystick.joy1_Buttons){
-			case 0:
-
-				break;
 			case 1:
-				servo[backRightServo] = 190;
-	    	servo[backLeftServo] = 0;
-	    	wait1Msec(400);
-	    	servo[backLeftServo] = 127;
+				servoPos(50, false);
 				break;
 			case 2:
-				servo[backRightServo] = 50;
-				servo[backLeftServo] = 256;
-				break;
-			case 3:
-				break;
-			case 4:
-				break;
-			case 5:
-				break;
-			case 6:
-				break;
-			case 7:
-				break;
-			case 8:
+				servoPos(190, false);
 				break;
 			default:
 				break;
@@ -149,18 +136,14 @@ task main(){
 		if(joystick.joy2_TopHat != -1){
     	if(joystick.joy2_TopHat == 0){
 				liftPos(2);
-				//wait1Msec(400);
     	}else if(joystick.joy2_TopHat == 1){
     	}else if(joystick.joy2_TopHat == 2){
     		liftPos(3);
-				//wait1Msec(400);
     	}else if(joystick.joy2_TopHat == 3){
     	}else if(joystick.joy2_TopHat == 4){
 				liftPos(0);
-				//wait1Msec(400);
     	}else if(joystick.joy2_TopHat == 6){
     		liftPos(1);
-				//wait1Msec(400);
       }else if(joystick.joy2_TopHat == 5){
     	}else if(joystick.joy2_TopHat == 7){
     	}
@@ -181,19 +164,37 @@ task main(){
     }else if(joystick.joy2_Buttons & 0x02){
     	//motor[beaterBar] = 0;
     	servo[topServo] = 100;
+    }else if(joy2Btn(6) == 1){
+    	motor[beaterBar] = -50;
+    }else if(joy2Btn(8) == 1 && joy2Btn(9) == 1){
+   		xx = 42;
+    	nMotorEncoder[lift] = 0;
     }
 
-
     if(joystick.joy2_y1 > zero){ //up
-			if(liftCheck(liftmod)){
-				motor[lift] = liftmod;
-			}
+    	xx = 42;
+			motor[lift] = joystick.joy2_y1;
 		}else if(joystick.joy2_y1 < -zero){ //down
-			if(liftCheck(liftmod)){
-				motor[lift] = -liftmod;
-			}
+			xx = 42;
+			motor[lift] = joystick.joy2_y1;
 		}else{
 			motor[lift] = 0;
 		}
+
+		if(xx == 42){
+	  }else if(nMotorEncoder[lift] >= xx){
+				motor[lift] = 100;
+				if(nMotorEncoder[lift] <= xx){
+					motor[lift] = 0;
+					xx = 42;
+				}
+		}else if(nMotorEncoder[lift] <= xx){
+	   		motor[lift] = -100;
+	   		if(nMotorEncoder[lift] >= xx){
+	   			motor[lift] = 0;
+	   			xx = 42;
+	   		}
+		}
+
 	}
 }
