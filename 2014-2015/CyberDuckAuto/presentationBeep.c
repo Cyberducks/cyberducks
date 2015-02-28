@@ -246,6 +246,10 @@ task eopd(){
     } // if ball close
   }
 }
+float a = 0;
+float b = 0;
+float c = 0;
+float d = 0;
 
 task main()
 {
@@ -261,11 +265,22 @@ task main()
 			int ir2 = acS1b+acS2b+acS3b+acS4b+acS5b;
 			ir1 = ir1/5;
 			ir2 = ir2/5;
-		 	PlayImmediateTone(1024, 10);
-		 	PlayImmediateTone(440, 10);
-		 	wait1Msec(1000-ir1*ir2);
-		 	ClearSounds();
 
+			if(a == b){
+		 		PlayImmediateTone(1024, 10);
+		 		a = 0;
+			}else if(a == 0){
+				b = ir1;
+			}else{a++}
+			if(c == d){
+		 		PlayImmediateTone(440, 10);
+		 		c = 0;
+			}else if(c == 0){
+				d = ir2;
+			}else{c++;}
+
+		 	ClearSounds();
+			wait1Msec(100);
 		 	nxtDisplayTextLine(4, "ir1:  %4d", ir1);
       nxtDisplayTextLine(3, "ir2:  %4d", ir2);
 
