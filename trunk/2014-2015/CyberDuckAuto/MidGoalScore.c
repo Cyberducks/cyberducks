@@ -4,10 +4,10 @@
 #pragma config(Sensor, S2,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S3,     GYRO,           sensorAnalogInactive)
 #pragma config(Sensor, S4,     HTSMUX,         sensorI2CCustom)
-#pragma config(Motor,  mtr_S1_C1_1,     rightFront,    tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C1_1,     rightFront,    tmotorTetrix, PIDControl, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C1_2,     rightBack,     tmotorTetrix, PIDControl, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C2_1,     leftBack,      tmotorTetrix, PIDControl, encoder)
-#pragma config(Motor,  mtr_S1_C2_2,     leftFront,     tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     leftFront,     tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S2_C2_1,     beaterBar,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S2_C2_2,     lift,          tmotorTetrix, openLoop, encoder)
 #pragma config(Servo,  srvo_S2_C1_1,    backRightServo,       tServoStandard)
@@ -80,11 +80,19 @@ void xSet(float power){
 void GoStraightByGyro (float straightHead, float power) {
       	// stay on heading from before button was pressed
         if (SubtractFromCurrHeading(straightHead) > GyroTolerance) {
-          motor[rightBack] = power+ti;
-	  			motor[rightFront] = power+ti;
+          //motor[rightBack] = power+ti;
+	  			//motor[rightFront] = power+ti;
+        		motor[rightBack] = power;
+						motor[leftBack] = -power;
+						motor[leftFront] = -power;
+						motor[rightFront] = power;
       } else if (SubtractFromCurrHeading(straightHead) < -GyroTolerance) {
-        	motor[leftBack] = power+ti;
-	  			motor[leftFront] = power+ti;
+        	//motor[leftBack] = power+ti;
+	  			//motor[leftFront] = power+ti;
+      		 	motor[rightBack] = -power;
+						motor[leftBack] = power;
+						motor[leftFront] = power;
+						motor[rightFront] = -power;
       } else  {
           xSet(power);
       }
@@ -133,6 +141,8 @@ void turnDeg(float deg, float power){
 	if(deg > 0){
 		//currHeading -= ofset;
 		motor[leftBack] = power;
+		motor[leftFront] = power;
+		motor[rightFront] = -power;
   	motor[rightBack] = -power;
   	while(deg >= currHeading){
 			wait1Msec(1);
@@ -142,6 +152,8 @@ void turnDeg(float deg, float power){
 	}else{
 	  //currHeading += ofset;
 		motor[leftBack] = -power;
+		motor[leftFront] = -power;
+		motor[rightFront] = power;
   	motor[rightBack] = power;
   	while(deg <= currHeading){
 			wait1Msec(1);
@@ -180,6 +192,7 @@ task main(){
 	initializeRobot();
 	wait1Msec(200);
 	waitForStart();
+	wait1Msec(100);
 	StartTask(getHeading);
 	wait1Msec(500);
 	servo[backRightServo] = 190;
