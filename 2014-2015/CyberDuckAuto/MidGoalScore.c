@@ -79,17 +79,19 @@ void GoStraightByGyro (float straightHead, float power) {
         if (SubtractFromCurrHeading(straightHead) > GyroTolerance) {
           //motor[rightBack] = power+ti;
 	  			//motor[rightFront] = power+ti;
-        		motor[rightBack] = power;
-						motor[leftBack] = -power;
-						motor[leftFront] = -power;
-						motor[rightFront] = power;
-      } else if (SubtractFromCurrHeading(straightHead) < -GyroTolerance) {
-        	//motor[leftBack] = power+ti;
-	  			//motor[leftFront] = power+ti;
-      		 	motor[rightBack] = -power;
+        		motor[rightBack] = -power;
 						motor[leftBack] = power;
 						motor[leftFront] = power;
 						motor[rightFront] = -power;
+						PlayImmediateTone(1024, 10);
+      } else if (SubtractFromCurrHeading(straightHead) < -GyroTolerance) {
+        	//motor[leftBack] = power+ti;
+	  			//motor[leftFront] = power+ti;
+      		 	motor[rightBack] = power;
+						motor[leftBack] = -power;
+						motor[leftFront] = -power;
+						motor[rightFront] = power;
+						PlayImmediateTone(1024, 10);
       } else  {
           xSet(power);
       }
@@ -98,14 +100,11 @@ void forwardInc(float inches, float power){
 	nMotorEncoder[rightBack] = 0;
   nMotorEncoder[leftBack] = 0;
 
-  //int head = currHeading;
+  int head = currHeading;
 	if(inches > 0){
-	  GoStraightByGyro(currHeading, power);
-
-	  while(nMotorEncoder[rightBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] < (inches/ROTDISTANCE)*360){}
+	  while(nMotorEncoder[rightBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] < (inches/ROTDISTANCE)*360){GoStraightByGyro(head, power);}
 	}else{
-		GoStraightByGyro(currHeading, -power);
-	  while(nMotorEncoder[rightBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] > (inches/ROTDISTANCE)*360){}
+	  while(nMotorEncoder[rightBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] > (inches/ROTDISTANCE)*360){GoStraightByGyro(head, -power);}
 	}
 	xSet(0);
 }
@@ -193,7 +192,13 @@ task main(){
 	wait1Msec(3000);
 	liftPos(0);
 	wait1Msec(500);
-	turnDeg(15, 20);
-	forwardInc(175, 50);
+	StopTask(getHeading);
+	currHeading = 0;
+	StartTask(getHeading);
+	wait10Msec(50);
+	turnDeg(30, 20);
+	wait10Msec(20);
+	forwardInc(175, 40);
+	wait10Msec(40);
 	turnDeg(180, 30);
 }
