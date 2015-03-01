@@ -2,10 +2,10 @@
 #pragma config(Hubs,  S2, HTServo,  HTMotor,  none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C1_1,     rightFront,    tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C1_2,     rightBack,     tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_1,     leftBack,      tmotorTetrix, openLoop, encoder)
-#pragma config(Motor,  mtr_S1_C2_2,     leftFront,     tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_1,     rightFront,    tmotorTetrix, PIDControl, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C1_2,     rightBack,     tmotorTetrix, PIDControl, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C2_1,     leftBack,      tmotorTetrix, PIDControl, encoder)
+#pragma config(Motor,  mtr_S1_C2_2,     leftFront,     tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S2_C2_1,     beaterBar,     tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S2_C2_2,     lift,          tmotorTetrix, openLoop, encoder)
 #pragma config(Servo,  srvo_S2_C1_1,    backRightServo,       tServoStandard)
@@ -19,10 +19,21 @@
 //all naming is this program are based of positive y being forwards and positive x being right
 #include "JoystickDriver.c"
 
+#include "../drivers-3x/hitechnic-sensormux.h"
+#include "../drivers-3x/hitechnic-irseeker-v2.h"
+#include "../drivers-3x/hitechnic-gyro.h"
+#include "../drivers-3x/hitechnic-eopd.h"
+#include "../drivers-3x/lego-light.h"
+
+const tMUXSensor IRS1 = msensor_S4_1;
+const tMUXSensor IRS2 = msensor_S4_2;
+const tMUXSensor HTEOPD = msensor_S4_3;
+const tMUXSensor LEGOLS = msensor_S4_4;
+
 short speedMod = 2;
-short straifMod = 2;
+short straifMod = 1;
 short turnMod = 1;
-short backMod = 2;
+short backMod = 1;
 short frontMod = 2;
 short zero = 20;
 float liftmod = 75;
@@ -102,6 +113,11 @@ task main(){
   // wait for start of tele-op phase
   waitForStart();
   //actual control of the robot
+  int _raw = 0;
+  int _processed = 0;
+
+  // Set the sensor to short range
+  //HTEOPDsetShortRange(HTEOPD);
   while (true){
 		getJoystickSettings(joystick);
 		//code for robot panning controlled by the left joystick
@@ -124,7 +140,7 @@ task main(){
 		//button actions
 		switch(joystick.joy1_Buttons){
 			case 1:
-				servoPos(50, false);
+				servoPos(50, true);
 				break;
 			case 2:
 				servoPos(190, false);
@@ -166,7 +182,7 @@ task main(){
     	servo[topServo] = 100;
     }else if(joy2Btn(6) == 1){
     	motor[beaterBar] = -50;
-    }else if(joy2Btn(8) == 1 && joy2Btn(9) == 1){
+    }else if(joy2Btn(9) == 1 && joy2Btn(10) == 1){
    		xx = 42;
     	nMotorEncoder[lift] = 0;
     }
@@ -195,6 +211,24 @@ task main(){
 	   			xx = 42;
 	   		}
 		}
-
+		/*
+		// Read the raw sensor value
+    _raw = HTEOPDreadRaw(HTEOPD);
+    // read the processed value which is linear with
+    // the distance detected.  Use the processed value
+    // when you want to determine distance to an object
+    _processed = HTEOPDreadProcessed(HTEOPD);
+    nxtDisplayClearTextLine(3);
+    nxtDisplayClearTextLine(4);
+    nxtDisplayTextLine(4, "Proc:  %4d", _processed);
+    nxtDisplayTextLine(3, "Raw :  %4d", _raw);
+    wait1Msec(50);
+    if (_processed > 41) {
+      LSsetActive(LEGOLS); // turn light on
+      PlaySound(soundBeepBeep);
+      while(bSoundActive){};
+      LSsetInactive(LEGOLS); // turn light off
+    } // if ball close
+		*/
 	}
 }
