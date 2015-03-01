@@ -121,39 +121,11 @@ void forwardInc(float inches, float power){
 	nMotorEncoder[rightBack] = 0;
   nMotorEncoder[leftBack] = 0;
 
-  //int head = currHeading;
+  int head = currHeading;
 	if(inches > 0){
-	  GoStraightByGyro(currHeading, power);
-
-	  while(nMotorEncoder[rightBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] < (inches/ROTDISTANCE)*360){
-	  	/*
-	  	if(head+4 < currHeading){
-	  		motor[rightBack] = power+ti;
-	  		motor[rightFront] = power+ti;
-	  	}else if(head-4 > currHeading){
-	  		motor[leftBack] = power-ti;
-	  		motor[leftFront] = power-ti;
-	  	}else{
-	  		xSet(power);
-	  	}
-	  	*/
-
-	  }
+	  while(nMotorEncoder[rightBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] < (inches/ROTDISTANCE)*360){GoStraightByGyro(head, power);}
 	}else{
-		GoStraightByGyro(currHeading, -power);
-	  while(nMotorEncoder[rightBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] > (inches/ROTDISTANCE)*360){
-	  	/*
-	  	if(head+4 < currHeading){
-	  		motor[rightBack] = power-ti;
-	  		motor[rightFront] = power-ti;
-	  	}else if(head-4 > currHeading){
-	  		motor[leftBack] = power+ti;
-	  		motor[leftFront] = power+ti;
-	  	}else{
-	  		xSet(power);
-	  	}
-	  	*/
-	  }
+	  while(nMotorEncoder[rightBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] > (inches/ROTDISTANCE)*360){GoStraightByGyro(head, -power);}
 	}
 	xSet(0);
 }
