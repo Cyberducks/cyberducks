@@ -33,8 +33,8 @@ const tMUXSensor LEGOLS = msensor_S4_4;
 short speedMod = 2;
 short straifMod = 1;
 short turnMod = 1;
-short backMod = 1;
-short frontMod = 2;
+short backMod = 5;
+short frontMod = 1;
 short zero = 20;
 float liftmod = 75;
 
