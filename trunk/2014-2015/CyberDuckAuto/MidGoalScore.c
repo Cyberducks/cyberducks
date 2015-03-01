@@ -24,9 +24,6 @@
 #include "../drivers-3x/hitechnic-irseeker-v2.h"
 #include "../drivers-3x/hitechnic-gyro.h"
 
-//const tMUXSensor IRS1 = msensor_S4_1;
-//const tMUXSensor IRS2 = msensor_S4_2;
-
 float GyroTolerance = 6;
 float currHeading = 0;
 float ofset = 28;
@@ -105,35 +102,10 @@ void forwardInc(float inches, float power){
 	if(inches > 0){
 	  GoStraightByGyro(currHeading, power);
 
-	  while(nMotorEncoder[rightBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] < (inches/ROTDISTANCE)*360){
-	  	/*
-	  	if(head+4 < currHeading){
-	  		motor[rightBack] = power+ti;
-	  		motor[rightFront] = power+ti;
-	  	}else if(head-4 > currHeading){
-	  		motor[leftBack] = power-ti;
-	  		motor[leftFront] = power-ti;
-	  	}else{
-	  		xSet(power);
-	  	}
-	  	*/
-
-	  }
+	  while(nMotorEncoder[rightBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] < (inches/ROTDISTANCE)*360){}
 	}else{
 		GoStraightByGyro(currHeading, -power);
-	  while(nMotorEncoder[rightBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] > (inches/ROTDISTANCE)*360){
-	  	/*
-	  	if(head+4 < currHeading){
-	  		motor[rightBack] = power-ti;
-	  		motor[rightFront] = power-ti;
-	  	}else if(head-4 > currHeading){
-	  		motor[leftBack] = power+ti;
-	  		motor[leftFront] = power+ti;
-	  	}else{
-	  		xSet(power);
-	  	}
-	  	*/
-	  }
+	  while(nMotorEncoder[rightBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] > (inches/ROTDISTANCE)*360){}
 	}
 	xSet(0);
 }
@@ -184,6 +156,20 @@ void liftPos(float x){
 	}
 	motor[lift] = 0;
 }
+void servoPos(short x, bool b){
+	servo[backLeftServo] = x;
+	if(b){
+		servo[backRightServo] = 256;
+		if(ServoValue[backRightServo] > servoTarget[backRightServo]){
+				servo[backRightServo] = 127;
+		}
+	}else{
+		servo[backRightServo] = 0;
+		if(ServoValue[backRightServo] < servoTarget[backRightServo]){
+				servo[backRightServo] = 127;
+		}
+	}
+}
 void initializeRobot(){
 	  servo[topServo] = 235;
 	  nMotorEncoder[lift] = 0;
@@ -191,47 +177,23 @@ void initializeRobot(){
 task main(){
 	initializeRobot();
 	wait1Msec(200);
-	waitForStart();
+	//waitForStart();
 	wait1Msec(100);
 	StartTask(getHeading);
 	wait1Msec(500);
-	servo[backRightServo] = 190;
-  servo[backLeftServo] = 0;
-  wait1Msec(400);
-	servo[backLeftServo] = 127;
-	//turnDeg(15, 30);
+	servoPos(50, true);
 	motor[beaterBar] = -30;
 	forwardInc(-100, 15);
-	//turnDeg(10, 25);
 	forwardInc(-48, 20);
 	motor[beaterBar] = 0;
-	//forwardInc(-36, 20);
-	servo[backRightServo] = 50;
-	servo[backLeftServo] = 256;
+	servoPos(190, false);
 	wait1Msec(1000);
 	liftPos(2);
 	servo[topServo] = 100;
 	wait1Msec(3000);
 	liftPos(0);
-	/*
-	StopTask(getHeading);
-	wait1Msec(100);
-	StartTask(getHeading);
-	*/
 	wait1Msec(500);
 	turnDeg(15, 20);
 	forwardInc(175, 50);
 	turnDeg(180, 30);
-	//forwardInc(-36, 15);
-
-
-	/*
-	wait1Msec(3000);
-	motor[lift] = 100;
-  wait1Msec(5000);
-  motor[lift] = 0;
-  servo[topServo] = 100;
-  */
-
-
 }
