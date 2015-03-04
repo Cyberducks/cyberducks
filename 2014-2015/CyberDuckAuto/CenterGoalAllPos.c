@@ -140,13 +140,13 @@ void turnDeg(float deg, float power){
   		nxtDisplayTextLine(5, "diff: %3.0f", SubtractFromCurrHeading (deg));
 		}
 	}else{
+		deg *= -1;
 		motor[leftBack] = -power;
   	motor[rightBack] = power;
-  	while(deg <= currHeading){
+  	while(SubtractFromCurrHeading(360-deg) > 0){
 			wait1Msec(1);
-			nxtDisplayTextLine(2, "servo: %d", ServoValue[servo1]);
   		nxtDisplayTextLine(3, "head: %3.0f", currHeading);
-  		nxtDisplayTextLine(5, "diff: %3.0f", SubtractFromCurrHeading (deg));
+ 			nxtDisplayTextLine(5, "diff: %3.0f", SubtractFromCurrHeading (deg));
 		}
 	}
 	xSet(0);
@@ -168,7 +168,7 @@ void liftPos(float x){
 			motor[lift] = 100;
 			while(nMotorEncoder[lift] >= x){}
 	}else if(nMotorEncoder[lift] <= x){
-   		motor[lift] = -100;
+   		motor[lift] = -50;
    		while(nMotorEncoder[lift] <= x){}
 	}
 	motor[lift] = 0;
@@ -232,8 +232,8 @@ task main()
   wait1Msec(400);
   StartTask(infared);
 	wait1Msec(200);
-	int ir1 = acS1a+acS2a+acS3a+acS4a+acS5a;
-	int ir2 = acS1b+acS2b+acS3b+acS4b+acS5b;
+	int ir2 = acS1a+acS2a+acS3a+acS4a+acS5a;
+	int ir1 = acS1b+acS2b+acS3b+acS4b+acS5b;
 	for(float i = 0; i <= 10; i++){
       if(ir1 < ir2-5){
       	PlayImmediateTone(440, 10);
@@ -253,21 +253,28 @@ task main()
   ClearSounds();
   //code for each of the three center positions a=1 b=2 c=3
   StopTask(getHeading);
-  wait10Msec(400);
+  wait10Msec(50);
   StartTask(getHeading);
 	wait1Msec(200);
   if(a > (b+c)/2){
   	//PlayImmediateTone(440, 10);
   	currHeading = 0;
-		turnDeg(20, 25);
+		turnDeg(-20, 25);
 		wait10Msec(50);
   	forwardInc(74, 30);
   	wait10Msec(50);
+  	StopTask(getHeading);
   	currHeading = 0;
-  	turnDeg(50, 30);
-  	wait10Msec(50);
-  	forwardInc(-20, 25);
+  	wait1Msec(200);
+  	StartTask(getHeading);
+  	wait1Msec(100);
+  	turnDeg(-52, 20);//sdfhjkjhgftrhjkl;kjrtykl;kjgfdsghj.,mhfdsfghjkfdsgtgr5gtgr
+  	wait10Msec(25);
+  	forwardInc(-22, 25);
   	liftPos(3);
+  	servo[topServo] = 210;//original 150
+  	wait10Msec(25);
+  	servo[topServo] = 235;
   	wait10Msec(500);
   	liftPos(0);
   	wait10Msec(500);
@@ -275,5 +282,20 @@ task main()
   	PlayImmediateTone(1024, 10);
   }else if(c > (a+b)/2){
   	PlayImmediateTone(2024, 10);
+  	StopTask(getHeading);
+  	currHeading = 0;
+  	wait1Msec(200);
+  	StartTask(getHeading);
+		turnDeg(-120, 25);
+		wait10Msec(70);
+  	forwardInc(-35, 30);
+  	wait10Msec(50);
+  	liftPos(3);
+  	servo[topServo] = 210;//original 150
+  	wait10Msec(25);
+  	servo[topServo] = 235;
+  	wait10Msec(500);
+  	liftPos(0);
+  	wait10Msec(500);
   }
 }

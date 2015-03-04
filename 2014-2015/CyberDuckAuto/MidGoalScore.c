@@ -24,7 +24,7 @@
 #include "../drivers-3x/hitechnic-irseeker-v2.h"
 #include "../drivers-3x/hitechnic-gyro.h"
 
-float GyroTolerance = 6;
+float GyroTolerance = 8;
 float currHeading = 0;
 float ofset = 28;
 float ti = 20;
@@ -83,7 +83,7 @@ void GoStraightByGyro (float straightHead, float power) {
 						motor[leftBack] = power;
 						motor[leftFront] = power;
 						motor[rightFront] = -power;
-						PlayImmediateTone(1024, 10);
+						//PlayImmediateTone(1024, 10);
       } else if (SubtractFromCurrHeading(straightHead) < -GyroTolerance) {
         	//motor[leftBack] = power+ti;
 	  			//motor[leftFront] = power+ti;
@@ -91,7 +91,7 @@ void GoStraightByGyro (float straightHead, float power) {
 						motor[leftBack] = -power;
 						motor[leftFront] = -power;
 						motor[rightFront] = power;
-						PlayImmediateTone(1024, 10);
+						//PlayImmediateTone(1024, 10);
       } else  {
           xSet(power);
       }
@@ -99,12 +99,14 @@ void GoStraightByGyro (float straightHead, float power) {
 void forwardInc(float inches, float power){
 	nMotorEncoder[rightBack] = 0;
   nMotorEncoder[leftBack] = 0;
+  nMotorEncoder[rightFront] = 0;
+  nMotorEncoder[leftFront] = 0;
 
   int head = currHeading;
 	if(inches > 0){
-	  while(nMotorEncoder[rightBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] < (inches/ROTDISTANCE)*360){GoStraightByGyro(head, power);}
+	  while(nMotorEncoder[rightBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] < (inches/ROTDISTANCE)*360 || nMotorEncoder[rightFront] < (inches/ROTDISTANCE)*360 || nMotorEncoder[leftFront] < (inches/ROTDISTANCE)*360){GoStraightByGyro(head, power);}
 	}else{
-	  while(nMotorEncoder[rightBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] > (inches/ROTDISTANCE)*360){GoStraightByGyro(head, -power);}
+	  while(nMotorEncoder[rightBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftBack] > (inches/ROTDISTANCE)*360 || nMotorEncoder[rightFront] > (inches/ROTDISTANCE)*360 || nMotorEncoder[leftFront] > (inches/ROTDISTANCE)*360){GoStraightByGyro(head, -power);}
 	}
 	xSet(0);
 }
@@ -121,12 +123,10 @@ void turnDeg(float deg, float power){
   		nxtDisplayTextLine(5, "diff: %3.0f", SubtractFromCurrHeading (deg));
 		}
 	}else{
-	  //currHeading += ofset;
+		deg *= -1;
 		motor[leftBack] = -power;
-		motor[leftFront] = -power;
-		motor[rightFront] = power;
   	motor[rightBack] = power;
-  	while(deg <= currHeading){
+  	while(SubtractFromCurrHeading(360-deg) > 0){
 			wait1Msec(1);
   		nxtDisplayTextLine(3, "head: %3.0f", currHeading);
  			nxtDisplayTextLine(5, "diff: %3.0f", SubtractFromCurrHeading (deg));
@@ -182,7 +182,7 @@ task main(){
 	wait1Msec(500);
 	servoPos(50, true);
 	motor[beaterBar] = -30;
-	forwardInc(-100, 15);
+	forwardInc(-100, 20);
 	forwardInc(-48, 20);
 	motor[beaterBar] = 0;
 	servoPos(190, false);
@@ -195,10 +195,10 @@ task main(){
 	StopTask(getHeading);
 	currHeading = 0;
 	StartTask(getHeading);
-	wait10Msec(50);
+	wait10Msec(20);
 	turnDeg(30, 20);
 	wait10Msec(20);
-	forwardInc(175, 40);
-	wait10Msec(40);
+	forwardInc(175, 50);
+	wait10Msec(20);
 	turnDeg(180, 30);
 }
