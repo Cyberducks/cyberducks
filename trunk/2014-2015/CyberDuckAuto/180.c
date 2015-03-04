@@ -137,9 +137,10 @@ void turnDeg(float deg, float power){
 		}
 	}else{
 	  //currHeading += ofset;
+		deg *= -1;
 		motor[leftBack] = -power;
   	motor[rightBack] = power;
-  	while(deg <= currHeading){
+  	while(SubtractFromCurrHeading(360-deg) > 0){
 			wait1Msec(1);
   		nxtDisplayTextLine(3, "head: %3.0f", currHeading);
  			nxtDisplayTextLine(5, "diff: %3.0f", SubtractFromCurrHeading (deg));
@@ -156,9 +157,5 @@ task main(){
 	//waitForStart();
 	StartTask(getHeading);
 	wait1Msec(500);
-	//turnDeg(15, 30);
-	forwardInc(32, 30);
-	turnDeg(180, 20);
-	forwardInc(32, 30);
-	//turnDeg(-90, 20);
+	turnDeg(-20, 20)
 }
