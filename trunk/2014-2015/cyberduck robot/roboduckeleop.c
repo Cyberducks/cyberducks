@@ -33,8 +33,8 @@ const tMUXSensor LEGOLS = msensor_S4_4;
 short speedMod = 2;
 short straifMod = 1;
 short turnMod = 1;
-short backMod = 5;
-short frontMod = 1;
+float backMod = 6;
+float frontMod = 1;
 short zero = 20;
 float liftmod = 75;
 
@@ -87,6 +87,8 @@ void turn(short speed){
 	speed /= turnMod;
 	motor[leftBack] = speed;
 	motor[rightBack] = -speed;
+	motor[leftFront] = speed;
+	motor[rightFront] = -speed;
 }
 bool liftCheck(float x){
 	if(nMotorEncoder[lift] >= 0 + x && nMotorEncoder[lift] <= -(11.25*360) + x){
