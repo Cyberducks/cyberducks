@@ -45,17 +45,10 @@ task main()
 			}else if(nNxtButtonPressed == 2){
 				ySet(-30);
 			}else{
-
+				ySet(0);
 			}
 
-		getJoystickSettings(joystick);
-		if(joystick.joy1_y1 > zero){ //forwards
-			ySet(joystick.joy1_y1/2);
-		}else if(joystick.joy1_y1 < -zero){ //backwards
-			ySet(joystick.joy1_y1/2);
-		}else{
-			ySet(0);
-		}
+
 	}
 
 

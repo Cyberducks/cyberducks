@@ -232,21 +232,21 @@ task main()
   wait1Msec(400);
   StartTask(infared);
 	wait1Msec(200);
-	int ir2 = acS1a+acS2a+acS3a+acS4a+acS5a;
+	int ir2 = acS1a+ acS2a+acS3a+acS4a+acS5a;
 	int ir1 = acS1b+acS2b+acS3b+acS4b+acS5b;
 	for(float i = 0; i <= 10; i++){
-      if(ir1 < ir2-5){
+      if(ir1 < ir2-10){
       	PlayImmediateTone(440, 10);
         a += 1;
-      }else if(ir1+4 > ir2 && ir1-4 < ir2){
+      }else if(abs(ir1-ir2) <= 18){ //ir1-4 > ir2 && ir1+4 < ir2
       	PlayImmediateTone(1024, 10);
       	b += 1;
-      }else if(ir1 > ir2+5){
+      }else if(ir1 > ir2+10){
       	PlayImmediateTone(2024, 10);
 				c += 1;
       }else{
       	PlayImmediateTone(1024, 10);
-      	b += 1;
+      	//b += 1;
       }
       wait1Msec(200);
   }
@@ -280,21 +280,53 @@ task main()
   	wait10Msec(500);
   }else if(b > (a+c)/2){
   	PlayImmediateTone(1024, 10);
+  	StopTask(getHeading);
+  	currHeading = 0;
+  	wait1Msec(200);
+  	StartTask(getHeading);
+  	wait1Msec(100);
+		turnDeg(180, 25); //do a one 80
+		StopTask(getHeading);
+  	currHeading = 0;
+  	wait1Msec(200);
+  	StartTask(getHeading);
+		wait10Msec(70);
+  	forwardInc(-36, 30);//go back __ inches
+  	//StartTask(getHeading);
+  	//wait1Msec(100);
+		//turnDeg(20, 25);
+  	wait10Msec(200);
+  	liftPos(3);
+  	servo[topServo] = 210;//original 150
+  	wait10Msec(25);
+  	servo[topServo] = 235;
+  	wait10Msec(100);
+  	liftPos(0);
+  	wait10Msec(500);
   }else if(c > (a+b)/2){
   	PlayImmediateTone(2024, 10);
   	StopTask(getHeading);
   	currHeading = 0;
   	wait1Msec(200);
   	StartTask(getHeading);
+  	wait1Msec(100);
 		turnDeg(-120, 25);
+		StopTask(getHeading);
+  	currHeading = 0;
+  	wait1Msec(200);
+  	StartTask(getHeading);
 		wait10Msec(70);
   	forwardInc(-35, 30);
+  	StartTask(getHeading);
+  	wait1Msec(100);
+		turnDeg(-32, 25);
+		forwardInc(-4, 25);
   	wait10Msec(50);
   	liftPos(3);
   	servo[topServo] = 210;//original 150
   	wait10Msec(25);
   	servo[topServo] = 235;
-  	wait10Msec(500);
+  	wait10Msec(100);
   	liftPos(0);
   	wait10Msec(500);
   }

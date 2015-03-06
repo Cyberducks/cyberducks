@@ -249,7 +249,8 @@ task eopd(){
 float a = 0;
 float b = 0;
 float c = 0;
-float d = 0;
+float a1 = 0;
+float b1 = 0;
 
 task main()
 {
@@ -265,19 +266,25 @@ task main()
 			int ir2 = acS1b+acS2b+acS3b+acS4b+acS5b;
 			ir1 = ir1/5;
 			ir2 = ir2/5;
+			if(c <= 10){
+				a = 0;
+				b = 0;
+				c = 0;
+			}
+		  for(int i = 0; i <= 10; i++){
+			  if(ir1 < ir2-5){
+	      	PlayImmediateTone(440, 10);
+	        a += 1;
+	      }else if(ir1 > ir2+5){
+	      	PlayImmediateTone(1024, 10);
+					b += 1;
+	      }
+	      c += 1;
+		  }
+		  if(a1 <= 10){
 
-			if(a == b){
-		 		PlayImmediateTone(1024, 10);
-		 		a = 0;
-			}else if(a == 0){
-				b = ir1;
-			}else{a++}
-			if(c == d){
-		 		PlayImmediateTone(440, 10);
-		 		c = 0;
-			}else if(c == 0){
-				d = ir2;
-			}else{c++;}
+		  }
+
 
 		 	ClearSounds();
 			wait1Msec(100);
