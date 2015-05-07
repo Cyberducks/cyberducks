@@ -30,7 +30,7 @@ void loop()
  lightLevel = map(lightLevel, 0, 900, 0, 255); 
          //adjust the value 0 to 900 to
          //span 0 to 255
-
+lightLevel = 255 - lightLevel;
 
 
  lightLevel = constrain(lightLevel, 0, 255);//make sure the 
