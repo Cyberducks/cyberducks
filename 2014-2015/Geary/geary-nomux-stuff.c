@@ -4,6 +4,12 @@
 #include "../drivers-3x/lego-light.h"
 //#include "../drivers/lego-ultrasound.h"
 
+// NXT sensor ports:
+// 1 - right sonar or controller chain
+// 2 - left sonar
+// 3 - protoboard
+// 4 - gyro
+
 
 // ********************************* globals ************************************
 

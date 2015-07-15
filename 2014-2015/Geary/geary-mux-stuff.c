@@ -4,6 +4,18 @@
 #include "../drivers-3x/lego-light.h"
 #include "../drivers-3x/lego-ultrasound.h"
 
+// NXT sensor ports:
+// 1 - controller chain
+// 2 - multiplexer
+// 3 - protoboard
+// 4 - color ???
+//
+// Multiplexer ports:
+// 1 - light
+// 2 - left sonar
+// 3 - right sonar
+// 4 - gyro
+
 // ********************************* globals ************************************
 
 float currHeading = 0;  // Current heading of the robot
