@@ -284,9 +284,7 @@ void Turn180 (void) {
 }
 
 void VerifyMux (void) {
-	  int range2 = USreadDist(LEGOUS2);
-	  int range3 = USreadDist(LEGOUS3);
-	  if (range2 == 0 || range3 == 0) {
+	  if (HTSMUXreadPowerStatus(S2)) {
 	  	PlaySound(soundDownwardTones);
 	  	StopMotors();
       wait1Msec(500);
