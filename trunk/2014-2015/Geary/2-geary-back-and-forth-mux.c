@@ -14,14 +14,6 @@
 // in mux-stuff, mux = S2
 #include "geary-mux-stuff.c"
 
-task AvoidWalls() {
-    while(USreadDist(LEGOUS2) > 10)   // While the Sonar Sensor readings are less than the specified, 'distance_in_cm':
-      { wait1Msec(300); }
-    StopMotors();
-    PlayTone(1000,200);
-    wait1Msec(500);
-    StopAllTasks();
-}
 
 
 //////////////////////////////////////////////////////////////////////////////
