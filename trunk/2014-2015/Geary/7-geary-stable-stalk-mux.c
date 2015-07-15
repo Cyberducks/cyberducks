@@ -22,6 +22,9 @@
 task
 main ()
 {
+  wait1Msec(500);
+  VerifyMux();
+
   // position stalk and init protoboard for lights
   OrientStalkServo();
   ExtendLightServo();
