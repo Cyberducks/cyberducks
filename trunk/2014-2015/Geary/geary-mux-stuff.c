@@ -47,6 +47,8 @@ const tMUXSensor LEGOLS = msensor_S2_1;
 const int GREEN = 0;
 const int RED = 1;
 
+// ********************************* procedures ************************************
+
 void LightLed (int num) {
 	HTSPBwriteIO(HTSPB, 1 << (num));
 }
@@ -77,26 +79,6 @@ void InitProtoboardLights () {
   wait1Msec(500);
   LightsOff();
   //HTSPBwriteIO(HTSPB, 0x0);
-}
-// Task to keep track of the current heading using the HT Gyro, by Xander
-task getHeading () {
-	float delTime = 0;
-	float prevHeading = 0;
-	float curRate = 0;
-
-  HTGYROstartCal(HTGYRO);
-  while (true) {
-    time1[T1] = 0;
-    curRate = HTGYROreadRot(HTGYRO);
-    if (abs(curRate) > GyroSensitivity) {  // seems to give spurious readings when stationary
-      prevHeading = currHeading;
-      currHeading = prevHeading + curRate * delTime;
-      if (currHeading > 360) currHeading -= 360;
-      else if (currHeading < 0) currHeading += 360;
-    }
-    wait1Msec(GyroFrequency);
-    delTime = ((float)time1[T1]) / 1000;
-  }
 }
 
 // heading is never negative, but it can flip from 1 to 359, so do modulus 180
@@ -301,10 +283,45 @@ void Turn180 (void) {
 	StopTask (limitMotorTime);
 }
 
+void VerifyMux (void) {
+	  int range2 = USreadDist(LEGOUS2);
+	  int range3 = USreadDist(LEGOUS3);
+	  if (range2 == 0 || range3 == 0) {
+	  	PlaySound(soundDownwardTones);
+	  	StopMotors();
+      wait1Msec(500);
+      StopAllTasks();
+    }
+}
+
+// ********************************* tasks ************************************
+
+
 task AvoidWalls() {
     while((USreadDist(LEGOUS2) > 10) && (USreadDist(LEGOUS3) > 10)) { wait1Msec(300); }
     StopMotors();
     PlayTone(1000,200);
     wait1Msec(500);
     StopAllTasks();
+}
+
+// Task to keep track of the current heading using the HT Gyro, by Xander
+task getHeading () {
+	float delTime = 0;
+	float prevHeading = 0;
+	float curRate = 0;
+
+  HTGYROstartCal(HTGYRO);
+  while (true) {
+    time1[T1] = 0;
+    curRate = HTGYROreadRot(HTGYRO);
+    if (abs(curRate) > GyroSensitivity) {  // seems to give spurious readings when stationary
+      prevHeading = currHeading;
+      currHeading = prevHeading + curRate * delTime;
+      if (currHeading > 360) currHeading -= 360;
+      else if (currHeading < 0) currHeading += 360;
+    }
+    wait1Msec(GyroFrequency);
+    delTime = ((float)time1[T1]) / 1000;
+  }
 }

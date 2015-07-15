@@ -24,6 +24,7 @@ task
 main ()
 {
   wait1Msec(500);
+  VerifyMux();
   OrientStalkServo();
   ExtendLightServo();
   RetractLightServo();
