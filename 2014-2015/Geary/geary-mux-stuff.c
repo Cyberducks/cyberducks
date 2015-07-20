@@ -8,7 +8,7 @@
 // 1 - controller chain
 // 2 - multiplexer
 // 3 - protoboard
-// 4 - color ???
+// 4 - color
 //
 // Multiplexer ports:
 // 1 - light
@@ -23,7 +23,7 @@ float currHeading = 0;  // Current heading of the robot
 const int SonarTolerance = 2;
 const int HeadingTolerance = 4;
 const int GyroFrequency = 30; // millisecs
-const int GyroSensitivity = 3;  // min. degrees per sec that means we're accelerating, 3 is really sensitive
+int GyroSensitivity = 3;  // min. degrees per sec that means we're accelerating, 3 is really sensitive
 const int GyroTolerance = 1;  // degrees, difference means adjust motors
 const int ServoDelta = 2;
 const int ServoSteps = 3;
@@ -152,15 +152,15 @@ void OrientStalkServo (void) {
 
 void RetractLightServo (void) {
 	servoChangeRate[servo2] = ServoDelta;
-  while(ServoValue[servo2] > 0) {
-    servo[servo2] = 0;
+   while(ServoValue[servo2] > 20) {
+    servo[servo2] = 20;
     }
 }
 
 void ExtendLightServo (void) {
 	servoChangeRate[servo2] = ServoDelta;
-	while(ServoValue[servo2] < 110)    {
-    servo[servo2] = 110;
+	while(ServoValue[servo2] < 190)    {
+    servo[servo2] = 190;
     }
 }
 
