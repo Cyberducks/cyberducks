@@ -18,7 +18,6 @@ const int ServoDelta = 2;
 const int ServoSteps = 3;
 const int ServoFreq = 100; // millisecs
 
-const int DeadZone = 15;
 const int Forward = -1;
 const int Backward = 1;
 const int TurnTimeLimit = 3500; // millisecs
