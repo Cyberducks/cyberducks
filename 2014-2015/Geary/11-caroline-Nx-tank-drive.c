@@ -36,7 +36,7 @@ const int DeadZone = 15;
 #define HOPPERSCORE 90
 
 void MoveHopper (int hopperTarget) {
-  int motorUpSpeed = 30;
+  int motorUpSpeed = 40;
   int motorDownSpeed = -10;
   while (abs(nMotorEncoder[hopperNXT]-hopperTarget) > HOPPERTOLERANCE) {
  	  bool moveUp = nMotorEncoder[hopperNXT] < hopperTarget;
