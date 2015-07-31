@@ -20,7 +20,7 @@
  */
 
 const ubyte Addr = 0x02;
-const tSensors SensorPort = S1;        // Connect PSPNX sensorto this port!!
+const tSensors SensorPort = S4;        // Connect PSPNX sensorto this port!!
 #include "PSP-Nx-lib.h"
 
 int nLeftButton = 0;
