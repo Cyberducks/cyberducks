@@ -31,8 +31,10 @@ int nExitButton = 0;
 const int DeadZone = 15;
 
 #define HOPPERTOLERANCE 10 // NXT encoder count slop around each position
+
+// encoder positions
 #define HOPPERDOWN 5
-#define HOPPERUP 50
+#define HOPPERUP 65
 #define HOPPERSCORE 90
 
 void MoveHopper (int hopperTarget) {
