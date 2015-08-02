@@ -18,17 +18,23 @@
 // based on PSP-Nx-motor-control.c
 // http://www.mindsensors.com/index.php?module=documents&JAS_DocumentManager_op=viewDocument&JAS_Document_id=13
 
-const ubyte Addr = 0x02;
-const tSensors SensorPort = S4;        // Connect PSPNX sensorto this port!!
 #include "PSP-Nx-lib.h"
 #include "geary-nomux-stuff.c"
 
+//////////////////////////////////////////////////////////////////////////////
+//
+//      Globals
+//
+/////////////////////////////////////////////////////////////////////////////
+
+const ubyte Addr = 0x02;
+const tSensors SensorPort = S4;        // Connect PSPNX sensorto this port!!
 int nLeftButton = 0;
 int nRightButton = 0;
 int nEnterButton = 0;
 int nExitButton = 0;
-
 const int DeadZone = 15;
+int hopper_up, hopper_down, hopper_score;
 
 #define HOPPERTOLERANCE 10 // NXT encoder count slop around each position
 #define FINGERTOLERANCE 10
@@ -96,14 +102,38 @@ void TestPSPAnalog () {
 //      Hopper Task
 //
 /////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+//
+//      Main
+//
+/////////////////////////////////////////////////////////////////////////////
 
+task HopperPosition () {
+  while (true) {
+	    wait1Msec (500);
+
+		  // determine where to position hopper
+		  if (hopper_down) {
+        nxtDisplayTextLine(3,"Hopper down");
+        MoveHopper (HOPPERDOWN);
+      } else if (hopper_up) {
+        nxtDisplayTextLine(3,"Hopper up");
+        MoveHopper (HOPPERUP);
+      } else if (hopper_score) {
+        nxtDisplayTextLine(3,"Hopper score");
+        MoveHopper (HOPPERSCORE);
+      } else {
+        // default is up
+        nxtDisplayTextLine(3,"Hopper DEFAULT");
+        MoveHopper (HOPPERUP);
+      }
+}}
 
 //////////////////////////////////////////////////////////////////////////////
 //
 //      Main
 //
 /////////////////////////////////////////////////////////////////////////////
-task HopperPosition () {
 
 
 task
@@ -112,12 +142,10 @@ main ()
   int powerLeft, powerRight;
   int d_left_X, d_left_Y;
   int d_right_X, d_right_Y;
-  int hopper_up, hopper_down, hopper_score;
   int fingers_up, fingers_down, fingers_up_encoder, fingers_down_encoder;
   int trigger_pressed;
   int ok_to_drive = false;
-
-	psp currState;
+  psp currState;
 
   //
   // Note: program cannot be terminated if we hijack the 'exit' button. So there has to be an escape sequence
@@ -135,9 +163,11 @@ main ()
 
   TestPSPAnalog();
 
+  StartTask (HopperPosition);
+
   while ( true )
     {
-      wait1Msec (5);
+      wait1Msec (100);
 
       PSP_ReadButtonState(SensorPort, Addr, currState);
 
@@ -183,22 +213,6 @@ main ()
 		  motor[left] = powerLeft;
 		  motor[right] = powerRight;
 
-		  // determine where to position hopper
-		  if (hopper_down) {
-        nxtDisplayTextLine(3,"Hopper down");
-        MoveHopper (HOPPERDOWN);
-      } else if (hopper_up) {
-        nxtDisplayTextLine(3,"Hopper up");
-        MoveHopper (HOPPERUP);
-      } else if (hopper_score) {
-        nxtDisplayTextLine(3,"Hopper score");
-        MoveHopper (HOPPERSCORE);
-      } else {
-        // default is up
-        nxtDisplayTextLine(3,"Hopper DEFAULT");
-        MoveHopper (HOPPERUP);
-      }
-
 		  // determine where to position fingers
 		  if (fingers_down_encoder) {
         nxtDisplayTextLine(4,"E Fingers down");
@@ -221,8 +235,6 @@ main ()
 
 
     }
-
-  wait10Msec (100);
 
   StopAllTasks ();
 }
