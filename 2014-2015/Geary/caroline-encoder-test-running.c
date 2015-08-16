@@ -32,26 +32,32 @@ task main()
 {
 	int testMotor = left;
 
-  nMotorEncoder[testMotor] = 0;  //clear the TETRIX motor encoders
-  nMotorEncoder[hopper] = 0;  //clear the TETRIX motor encoders
+  nMotorEncoder[left] = 0;
+  nMotorEncoder[right] = 0;
+  nMotorEncoder[hopper] = 0;
+  nMotorEncoder[fingers] = 0;
 
   nMotorEncoderTarget[testMotor] = 3000; //set the target stoping position
   motor[testMotor] = 30; //turn both motors on at 30 percent power
   while (nMotorRunState[testMotor] != runStateIdle) //while the encoder wheel turns one revolution
   {
-  	int encoderVal = nMotorEncoder[left] + nMotorEncoder[right] + nMotorEncoder[hopper] + nMotorEncoder[fingers];
-	  nxtDisplayCenteredBigTextLine(1, "%4d", nMotorEncoder[encoderVal]);
+  	int encoderVal = nMotorEncoder[left] + nMotorEncoder[right] +  nMotorEncoder[fingers]+  nMotorEncoder[hopper];
+	  nxtDisplayCenteredBigTextLine(1, "%4d", encoderVal);
 	  wait1Msec(200);
   }
   motor[testMotor] = 0; //turn both motors off
 
-  nMotorEncoder[testMotor] = 0;  //clear the TETRIX motor encoders
+  nMotorEncoder[left] = 0;
+  nMotorEncoder[right] = 0;
+  nMotorEncoder[hopper] = 0;
+  nMotorEncoder[fingers] = 0;
+
   nMotorEncoderTarget[testMotor] = -3000; //set the target stoping position
   motor[testMotor] = -30; //turn both motors on at 30 percent power
   while (nMotorRunState[testMotor] != runStateIdle) //while the encoder wheel turns one revolution
   {
-  	int encoderVal = nMotorEncoder[left] + nMotorEncoder[right] + nMotorEncoder[hopper] + nMotorEncoder[fingers];
-	  nxtDisplayCenteredBigTextLine(1, "%4d", nMotorEncoder[encoderVal]);
+  	int encoderVal = nMotorEncoder[left] + nMotorEncoder[right]  + nMotorEncoder[fingers]+  nMotorEncoder[hopper];
+	  nxtDisplayCenteredBigTextLine(1, "%4d", encoderVal);
 	  wait1Msec(200);
   }
   motor[testMotor] = 0; //turn both motors off
