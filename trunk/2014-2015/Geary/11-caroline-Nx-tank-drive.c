@@ -5,7 +5,7 @@
 #pragma config(Motor,  motorA,          hopperNXT,     tmotorNXT, PIDControl, reversed, encoder)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
-#pragma config(Motor,  mtr_S1_C1_1,     left,          tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C1_1,     left,          tmotorTetrix, PIDControl, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C1_2,     right,         tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C2_1,     hopper,        tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_2,     fingers,       tmotorTetrix, PIDControl, reversed, encoder)
@@ -33,8 +33,9 @@ int nLeftButton = 0;
 int nRightButton = 0;
 int nEnterButton = 0;
 int nExitButton = 0;
-const int DeadZone = 15;
+const int DeadZone = 25;
 int hopper_up, hopper_down, hopper_score;
+int move_hopper_ok = false;
 
 #define HOPPERTOLERANCE 10 // NXT encoder count slop around each position
 #define FINGERTOLERANCE 10
@@ -42,9 +43,9 @@ int hopper_up, hopper_down, hopper_score;
 // encoder positions
 #define HOPPERDOWN 5
 #define HOPPERUP 65
-#define HOPPERSCORE 90
+#define HOPPERSCORE 80
 #define FINGERSUP 0
-#define FINGERSDOWN 2000
+#define FINGERSDOWN 3000
 #define FINGERUPSPEED - 50
 #define FINGERDOWNSPEED 50
 #define HOPPERUPSPEED 40
@@ -111,6 +112,7 @@ void TestPSPAnalog () {
 task HopperPosition () {
   while (true) {
 	    wait1Msec (500);
+      if (move_hopper_ok) {
 
 		  // determine where to position hopper
 		  if (hopper_down) {
@@ -127,6 +129,8 @@ task HopperPosition () {
         nxtDisplayTextLine(3,"Hopper DEFAULT");
         MoveHopper (HOPPERUP);
       }
+
+    } // ok to move hopper
 }}
 
 //////////////////////////////////////////////////////////////////////////////
@@ -139,12 +143,15 @@ task HopperPosition () {
 task
 main ()
 {
-  int powerLeft, powerRight;
+  int powerLeft = 0;
+  int powerRight = 0;
   int d_left_X, d_left_Y;
   int d_right_X, d_right_Y;
   int fingers_up, fingers_down, fingers_up_encoder, fingers_down_encoder;
-  int trigger_pressed;
-  int ok_to_drive = false;
+  int trigger_pressed, left_joystick_click, right_joystick_click;
+  int tank_drive_ok = false;
+  int steer_drive_ok = false;
+  int turbo_speed = false;
   psp currState;
 
   //
@@ -182,6 +189,9 @@ main ()
       hopper_up = !(bool)currState.c || !(bool)currState.a;
       hopper_score = !(bool)currState.b;
 
+      // keep hopper disabled until lifted manually, then go on automatic
+      if (hopper_up) { move_hopper_ok = true; }
+
       // right button pad
       fingers_up_encoder = !(bool)currState.triang;
       fingers_down_encoder = !(bool)currState.cross;
@@ -192,21 +202,45 @@ main ()
       trigger_pressed = (!(bool)currState.l1) || (!(bool)currState.l2)
                      || (!(bool)currState.r1) || (!(bool)currState.r2);
 
+      left_joystick_click = !(bool)currState.l_j_b ;
+      right_joystick_click = !(bool)currState.r_j_b;
+
       // by default, do not enable driving, to avoid driving off a table
-      if (trigger_pressed) { ok_to_drive = true; }
+      if (left_joystick_click) { tank_drive_ok = true; steer_drive_ok = false; }
+      if (right_joystick_click) { tank_drive_ok = false; steer_drive_ok = true; }
+
+      // drive slowly unless turbo
+      turbo_speed = trigger_pressed;
 
       /*
       * Determine power for each motor.
        * in doing so, take the Y component of left joystick
        * and X component of right joystick
       */
-      if (ok_to_drive) {
+
+      // tank drive
+      if (tank_drive_ok) {
 	      powerLeft = abs(d_left_Y) > DeadZone ? d_left_Y : 0;
 	      powerRight = abs(d_right_Y) > DeadZone ? d_right_Y : 0;
+	      if (!turbo_speed) {	powerLeft /= 2; powerRight /= 2; }
 	  	  nxtDisplayTextLine(1,"Left: %d", powerLeft);
   		  nxtDisplayTextLine(2,"Right: %d", powerRight);
+
+  		// steering
+  	  } else if (steer_drive_ok) {
+  	    // distribute power proportionally based on x value
+  	    int differential = abs(d_right_X) > DeadZone ? d_right_X : 0;
+	      int totalPower = abs(d_right_Y) > DeadZone ? d_right_Y : 0;
+	      if (!turbo_speed) {	totalPower /= 2; }
+	      float proportion = abs(differential) / 100.0;  // extreme steer -> 1
+	      powerLeft = differential > 0 ? totalPower * proportion : totalPower * (1.0 - proportion);
+	      powerRight = differential < 0 ? totalPower * proportion : totalPower * (1.0 - proportion);
+	  	  nxtDisplayTextLine(1,"Left: %d", powerLeft);
+  		  nxtDisplayTextLine(2,"Right: %d", powerRight);
+
+  		  // driving not enabled yet
 	    } else {
-		    nxtDisplayTextLine(1,"Press a Trigger");
+		    nxtDisplayTextLine(1,"Click a joystick");
 		    nxtDisplayTextLine(2,"to drive");
 		  }
 
