@@ -1,7 +1,12 @@
 #pragma config(Hubs,  S1, HTServo,  none,     none,     none)
+#pragma config(Hubs,  S2, HTMotor,  none,     none,     none)
+#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
+#pragma config(Sensor, S2,     ,               sensorI2CMuxController)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
+#pragma config(Motor,  mtr_S2_C1_1,     left,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S2_C1_2,     right,         tmotorTetrix, openLoop, reversed)
 #pragma config(Servo,  srvo_S1_C1_1,    turntable,            tServoContinuousRotation)
 #pragma config(Servo,  srvo_S1_C1_2,    arm,                  tServoContinuousRotation)
 #pragma config(Servo,  srvo_S1_C1_3,    claw,                 tServoStandard)
@@ -95,14 +100,6 @@ main ()
       claw_close_1 = (!(bool)currState.l1) || (!(bool)currState.l2);
       claw_close_2 = (!(bool)currState.r1) || (!(bool)currState.r2);
 
-      // left y controls arm
-      arm_up = (d_left_Y > DeadZone);
-      arm_down = (d_left_Y < -DeadZone);
-
-      // left x controls turntable
-      arm_left = (d_left_X > DeadZone);
-      arm_right = (d_left_X < -DeadZone);
-
       // for controlling tank or steer
       left_joystick_click = !(bool)currState.l_j_b ;
       right_joystick_click = !(bool)currState.r_j_b;
@@ -114,16 +111,19 @@ main ()
       // drive slowly unless turbo
       turbo_speed = false ; // trigger_pressed;
 
-      /*
-      * Determine power for each motor.
-       * in doing so, take the Y component of left joystick
-       * and X component of right joystick
-      */
+      if (!tank_drive_ok) { // if not tank drive, then left joystick controls arm and turntable
+	      // left y controls arm
+	      arm_up = (d_left_Y > DeadZone);
+	      arm_down = (d_left_Y < -DeadZone);
+	      // left x controls turntable
+	      arm_left = (d_left_X > DeadZone);
+	      arm_right = (d_left_X < -DeadZone);
+	    }
 
       // tank drive
       if (tank_drive_ok) {
-	      powerLeft = abs(d_left_Y) > DeadZone ? d_left_Y : 0;
-	      powerRight = abs(d_right_Y) > DeadZone ? d_right_Y : 0;
+	      powerLeft = abs(d_left_Y) > DeadZone ? abs(d_left_Y)*d_left_Y/100 : 0;
+	      powerRight = abs(d_right_Y) > DeadZone ? abs(d_right_Y)*d_right_Y/100 : 0;
 	      if (!turbo_speed) {	powerLeft /= 2; powerRight /= 2; }
 	  	  nxtDisplayTextLine(1,"Left: %d", powerLeft);
   		  nxtDisplayTextLine(2,"Right: %d", powerRight);
@@ -132,7 +132,7 @@ main ()
   	  } else if (steer_drive_ok) {
   	    // distribute power proportionally based on x value
   	    int differential = abs(d_right_X) > DeadZone ? d_right_X : 0;
-	      int totalPower = abs(d_right_Y) > DeadZone ? d_right_Y : 0;
+	      int totalPower = abs(d_right_Y) > DeadZone ? abs(d_right_Y)*d_right_Y/100 : 0;
 	      if (!turbo_speed) {	totalPower /= 2; }
 	      float proportion = abs(differential) / 100.0;  // extreme steer -> 1
 	      powerLeft = differential > 0 ? totalPower * proportion : totalPower * (1.0 - proportion);
@@ -183,6 +183,10 @@ main ()
 		  }
 		  servo[claw] = claw_position;
 		  nxtDisplayTextLine(4,"Claw position %d", claw_position);
+
+		  // drive
+		  motor[left] = powerLeft;
+		  motor[right] = powerRight;
 
     }
 
